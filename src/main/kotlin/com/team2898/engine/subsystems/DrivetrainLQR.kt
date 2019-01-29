@@ -28,7 +28,7 @@ abstract class DrivetrainLQR {
 
     fun clampU(u: Double) = clamp(u, 12.0)
 
-    val dt = 0.05
+    val dt = 0.001
 
     val C = Matrix(arrayOf(
             row(1.0, 0.0),
@@ -93,7 +93,7 @@ abstract class DrivetrainLQR {
     val L = A * kalman_gain
 
     fun genU(r: Matrix, ff: Boolean = true, x: RealMatrix = xHat): Matrix {
-        val r = r.scalarMultiply(1 / 3.281)
+        val r = r.scalarMultiply(1 / 3.281) // conf ft -> m
         val u_feedback = Matrix((Kc * (r - x)).data)
         if (!ff) return u_feedback
 
