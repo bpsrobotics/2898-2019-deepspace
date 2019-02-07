@@ -28,7 +28,7 @@ abstract class DrivetrainLQR {
 
     fun clampU(u: Double) = clamp(u, 12.0)
 
-    val dt = 0.001
+    val dt = 0.01
 
     val C = Matrix(arrayOf(
             row(1.0, 0.0),

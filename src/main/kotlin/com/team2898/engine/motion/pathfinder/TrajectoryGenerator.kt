@@ -7,7 +7,7 @@ import jaci.pathfinder.Trajectory
 data class TrajPoint(val t: Double, val x: Double, val y: Double, val vel: Double, val heading: Double, val angVel: Double)
 
 class TrajectoryGenerator {
-    fun getTrajPoints(prof: Trajectory) {
+    fun getTrajPoints(prof: Trajectory): Array<TrajPoint> {
         var t = 0.0
         val dt = prof[0].dt
         val points: Array<TrajPoint> by lazy {
@@ -19,5 +19,6 @@ class TrajectoryGenerator {
                 TrajPoint(t = t - dt, x = line.x, y = line.y, heading = line.heading, vel = line.velocity, angVel = dw)
             }
         }
+        return points
     }
 }

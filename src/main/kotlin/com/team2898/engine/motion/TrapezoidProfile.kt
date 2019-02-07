@@ -3,161 +3,137 @@ package com.team2898.engine.motion
 import edu.wpi.first.wpilibj.Timer
 import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.sign
+import kotlin.math.sqrt
 
+
+data class Constrains(val maxVel: Double, val maxAcc: Double)
+data class ProfilePos(val position: Double, val velocity: Double)
+enum class Shape { Trap, Tri }
 
 class TrapezoidProfile(
-        var maxAcc: Double, // in FSTU
-        var maxVel: Double // in FSTU
-) {
-    data class PVAData(
-            val currentPos: Double,
-            val currentVel: Double,
-            val targetPos: Double,
-            val targetVel: Double,
-            val targetAcc: Double,
-            val time: Double = 0.0
-    )
+        val constrains: Constrains,
+        val initial: ProfilePos) {
+    var oldTime = Timer.getFPGATimestamp()
+    var lastTime = oldTime
+    var dt = 0.0
+    var signM = 1.0
+    var shape = Shape.Tri
+    var isFinished = false
+    var oldPosRef = 0.0
+    var oldPos = 0.0
+    var oldVel = 0.0
+    var pos = 0.0
+    var vel = 0.0
+    var acc = 0.0
+    var tBrk = 0.0
+    var dBrk = 0.0
+    var tAcc = 0.0
+    var dAcc = 0.0
+    var dTot = 0.0
+    var tDec = 0.0
+    var dDec = 0.0
+    var dVel = 0.0
+    var tVel = 0.0
+    var velSt = 0.0
 
-    /**
-     * REST: resting
-     * ACC: Accelerating
-     * CONST: Const velocity
-     * DEC: Decelerating
-     */
-    private enum class CurrentState { REST, ACC, CONST, DEC }
+    fun update(posRef: Double): Double {
+        if (oldPosRef != posRef) {
+            isFinished = false
+            oldPosRef = posRef
+            oldPos = pos
+            oldVel = vel;
+            oldTime = lastTime;
 
-    val currentTime = { Timer.getFPGATimestamp() }
+            tBrk = abs(oldVel) / constrains.maxAcc
+            dBrk = tBrk * abs(oldVel) / 2
 
-    var currentPos = 0.0
-    var currentVel = 0.0
+            signM = sign(posRef - (oldPos + sign(oldVel) * dBrk))
 
-    private var OFFSET = 0.0
-
-    private var currentState = CurrentState.REST
-
-    private var lastTime = 0.0
-    private var startTime = 0.0
-
-    private var lastPos = 0.0
-    private var lastVel = 0.0
-
-    var targetPos = 0.0
-
-    var lastProfile = PVAData(0.0, 0.0, 0.0, 0.0, 0.0)
-
-    private var isFinished = false
-    private var dec = false
-    private var sign = kotlin.math.sign(targetPos)
-
-    init {
-        startTime = currentTime()
-        updateProfile()
-    }
-
-    fun updateProfile() {
-        lastPos = lastProfile.currentPos
-        lastVel = lastProfile.currentVel
-        currentPos = lastProfile.targetPos
-        currentVel = lastProfile.targetVel
-        lastTime = currentTime()
-        OFFSET = targetPos * 0.02
-    }
-
-    fun updateTarget(target: Double) {
-        isFinished = false
-        startTime = currentTime()
-        lastTime = currentTime()
-        targetPos = target
-        currentState = CurrentState.ACC
-        updateProfile()
-        sign = kotlin.math.sign(targetPos)
-    }
-
-    fun hasToDec(): Boolean {
-        val time = abs(currentVel) / maxAcc
-        val offSet = targetPos - currentPos
-        return abs(offSet) <= abs(currentVel * time + sign * (-maxAcc / 2) * Math.pow(time, 2.0))
-//        return math.fabs(offSet - self.__OFFSET) <= math.fabs(self.__currentVel * time + self.__sign * (-self.__maxAcc / 2) * math.pow(time, 2))
-    }
-
-    fun updateCurrentState() {
-        currentState = if (abs(targetPos - currentPos) < targetPos / OFFSET && abs(currentVel) < maxVel / OFFSET) {
-            isFinished = true
-            CurrentState.REST
-        } else if (hasToDec() || dec) {
-            dec = true
-            CurrentState.DEC
-        } else if (abs(maxVel) <= abs(currentVel)) {
-            CurrentState.CONST
-        } else {
-            CurrentState.ACC // This should never happen
-        }
-    }
-
-    fun update(): PVAData {
-        val deltaTime = currentTime() - lastTime
-        lastTime = currentTime()
-        if (isFinished) {
-            lastProfile = PVAData(
-                    currentPos = currentPos,
-                    currentVel = currentVel,
-                    targetPos = currentPos,
-                    targetVel = 0.0,
-                    targetAcc = 0.0,
-                    time = lastTime
-            )
-            return lastProfile
-        }
-        updateProfile()
-        updateCurrentState()
-        lastProfile = when (currentState) {
-            CurrentState.ACC -> {
-                PVAData(
-                        currentPos = currentPos,
-                        currentVel = currentVel,
-                        targetPos = currentPos + deltaTime * currentVel + sign * maxAcc/2 * Math.pow(deltaTime, 2.0),
-                        targetVel = currentVel + sign * maxAcc * deltaTime,
-                        targetAcc = sign * maxAcc,
-                        time = lastTime
-                )
+            if (signM != sign(oldVel)) {
+                tAcc = (constrains.maxVel / constrains.maxAcc)
+                dAcc = tAcc * (constrains.maxVel / 2)
+            } else {
+                tBrk = 0.0
+                dBrk = 0.0
+                tAcc = (constrains.maxVel - abs(oldVel)) / constrains.maxAcc
+                dAcc = tAcc * (constrains.maxVel + abs(oldVel)) / 2
             }
-            CurrentState.DEC -> {
-                PVAData(
-                        currentPos = currentPos,
-                        currentVel = currentVel,
-                        targetPos = currentPos + deltaTime * currentVel + sign + -maxAcc/2 * Math.pow(deltaTime, 2.0),
-                        targetVel = currentVel + sign * -maxAcc * deltaTime,
-                        targetAcc = sign * -maxAcc,
-                        time = lastTime
-                )
-            }
-            CurrentState.CONST -> {
-                PVAData(
-                        currentPos = currentPos,
-                        currentVel = currentVel,
-                        targetPos = currentPos + deltaTime * currentVel,
-                        targetVel = sign * maxVel,
-                        targetAcc = 0.0,
-                        time = lastTime
-                )
-            }
-            CurrentState.REST -> {
-                PVAData(
-                        currentPos = currentPos,
-                        currentVel = currentVel,
-                        targetPos =  currentPos,
-                        targetVel = 0.0,
-                        targetAcc = 0.0,
-                        time = lastTime
-                )
+
+            dTot = abs(posRef - oldPos + signM * dBrk)
+
+            tDec = constrains.maxVel / constrains.maxAcc
+            dDec = tDec * constrains.maxVel / 2
+            dVel = dTot - (dAcc + dDec)
+            tVel = dVel / constrains.maxVel
+
+
+            if (tVel > 0) shape = Shape.Trap
+            else {
+                shape = Shape.Tri
+
+                if (signM != sign(oldVel)) {
+                    velSt = sqrt(constrains.maxAcc * dTot)
+                    tAcc = (velSt / constrains.maxAcc);
+                    dAcc = tAcc * (velSt / 2)
+                } else {
+                    tBrk = 0.0
+                    dBrk = 0.0
+                    dTot = abs(posRef - oldPos)
+                    velSt = sqrt(0.5 * oldVel * oldVel + constrains.maxAcc * dTot)
+                    tAcc = (velSt - abs(oldVel)) / constrains.maxAcc
+                    tAcc = tAcc * (velSt + abs(oldVel)) / 2
+                }
+                tDec = velSt / constrains.maxAcc
+                dDec = dDec * velSt / 2
             }
         }
-        //println("vel: ${lastProfile.targetVel}, pos: ${lastProfile.targetPos}, finished: ${isFinished}")
-        return lastProfile
+
+        val currentTIme = Timer.getFPGATimestamp()
+        dt = currentTIme - oldTime
+        calcProfile(posRef)
+        lastTime = currentTIme
+        return pos
     }
 
-    fun isFinished(): Boolean {
-        return isFinished
+    fun calcProfile(posRef: Double) {
+        when (shape) {
+            Shape.Trap -> {
+                if (dt <= (tBrk + tAcc)) {
+                    pos = oldPos + oldVel * dt + signM * 0.5 * constrains.maxAcc * dt * dt
+                    vel = oldVel + signM * constrains.maxAcc * dt
+                    acc = signM * constrains.maxAcc
+                } else if (dt > (tBrk + tAcc) && dt < (tBrk + tAcc + tVel)) {
+                    pos = oldPos + signM * (-dBrk + dAcc + constrains.maxVel * (dt - dBrk - tAcc))
+                    vel = signM * constrains.maxVel;
+                    acc = 0.0
+                } else if (dt >= (dBrk + tAcc + tVel) && dt < (tBrk + tAcc + tVel + tDec)) {
+                    pos = oldPos + signM * (-dBrk + dAcc + dVel + constrains.maxVel * (dt - tBrk - tAcc - tVel) - 0.5 * constrains.maxAcc * (dt - tBrk - tAcc) * (dt - tBrk - tAcc));
+                    vel = signM * (constrains.maxVel - constrains.maxAcc * (dt - tBrk - tAcc - tVel));
+                    acc = -signM * constrains.maxAcc
+                } else {
+                    pos = posRef;
+                    vel = 0.0
+                    acc = 0.0
+                    isFinished = true;
+                }
+            }
+            Shape.Tri -> {
+                if (dt <= (tBrk + tAcc)) {
+                    pos = oldPos + oldVel * dt + signM * 0.5 * constrains.maxAcc * dt * dt
+                    vel = oldVel + signM * constrains.maxAcc * dt
+                    acc = signM * constrains.maxAcc;
+                } else if (dt > (tBrk + tAcc) && dt < (tBrk + tAcc + tDec)) {
+                    pos = oldPos + signM * (-dBrk + dAcc + velSt * (dt - tBrk - tAcc) - 0.5 * constrains.maxAcc * (dt - tBrk - tAcc) * (dt - tBrk - tAcc));
+                    vel = signM * (velSt - constrains.maxAcc * (dt - tBrk - tAcc));
+                    acc = -signM * constrains.maxAcc;
+                } else {
+                    pos = posRef;
+                    vel = 0.0;
+                    acc = 0.0
+                    isFinished = true;
+                }
+            }
+        }
     }
 }
-

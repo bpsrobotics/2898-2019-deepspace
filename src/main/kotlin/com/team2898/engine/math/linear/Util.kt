@@ -38,6 +38,8 @@ operator fun RealMatrix.times(other: RealMatrix) = this.multiply(other)
 operator fun RealMatrix.get(row: Int, col: Int) = this.getEntry(row, col)
 operator fun RealMatrix.set(row: Int, col: Int, value: Double) = this.setEntry(row, col, value)
 
+operator fun Matrix.times(other: Matrix) = this.multiply(other) as Matrix
+
 val RealMatrix.T
     get() = this.transpose()
 
