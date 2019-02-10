@@ -6,17 +6,19 @@ import com.team2898.engine.kinematics.Translation2d
 import com.team2898.engine.kinematics.Twist2d
 import com.team2898.engine.math.clamp
 import com.team2898.engine.math.linear.*
+import com.team2898.robot.config.DrivetrainConf.*
 import org.apache.commons.math3.linear.MatrixUtils
 import org.apache.commons.math3.linear.RealMatrix
 
 abstract class DrivetrainLQR {
     abstract val wheelbase: Double
-    abstract val A: Matrix
-    abstract val B: Matrix
-    abstract val Kc: Matrix
-    abstract val Kff: Matrix
-    abstract val M: Matrix
-
+    val A: Matrix = Dt_A
+    val B: Matrix = Dt_B
+    val Kc: Matrix = Dt_Kc
+    val Kff: Matrix = Dt_Kff
+    val M: Matrix = Dt_M
+// TODO move this somewhere
+    
     var history = listOf<dtState>()
 
     data class dtState(var pose: RigidTransform2d, var vel: Twist2d, var time: Double)
@@ -41,7 +43,7 @@ abstract class DrivetrainLQR {
     ))
 
     // leftSpeed, rightSpeed
-    abstract var x: RealMatrix
+    var x: RealMatrix = Matrix(arrayOf(row(0.0, 0.0))).T
 
     var xHat = x
 

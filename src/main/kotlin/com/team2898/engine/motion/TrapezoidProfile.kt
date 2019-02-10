@@ -8,132 +8,104 @@ import kotlin.math.sqrt
 
 
 data class Constrains(val maxVel: Double, val maxAcc: Double)
-data class ProfilePos(val position: Double, val velocity: Double)
-enum class Shape { Trap, Tri }
+data class ProfilePos(var position: Double, var velocity: Double)
 
-class TrapezoidProfile(
-        val constrains: Constrains,
-        val initial: ProfilePos) {
-    var oldTime = Timer.getFPGATimestamp()
-    var lastTime = oldTime
-    var dt = 0.0
-    var signM = 1.0
-    var shape = Shape.Tri
-    var isFinished = false
-    var oldPosRef = 0.0
-    var oldPos = 0.0
-    var oldVel = 0.0
-    var pos = 0.0
-    var vel = 0.0
-    var acc = 0.0
-    var tBrk = 0.0
-    var dBrk = 0.0
-    var tAcc = 0.0
-    var dAcc = 0.0
-    var dTot = 0.0
-    var tDec = 0.0
-    var dDec = 0.0
-    var dVel = 0.0
-    var tVel = 0.0
-    var velSt = 0.0
+class TrapezoidProfile(val constrains: Constrains,
+                       var initial: ProfilePos,
+                       var final: ProfilePos) {
 
-    fun update(posRef: Double): Double {
-        if (oldPosRef != posRef) {
-            isFinished = false
-            oldPosRef = posRef
-            oldPos = pos
-            oldVel = vel;
-            oldTime = lastTime;
+    var direction = 0
+    var cutoffBegin = 0.0
+    var cutoffDistBegin = 0.0
+    var cutoffEnd = 0.0
+    var cutoffDistEnd = 0.0
 
-            tBrk = abs(oldVel) / constrains.maxAcc
-            dBrk = tBrk * abs(oldVel) / 2
+    var fullTrapDist = 0.0
+    var accTime = 0.0
 
-            signM = sign(posRef - (oldPos + sign(oldVel) * dBrk))
-
-            if (signM != sign(oldVel)) {
-                tAcc = (constrains.maxVel / constrains.maxAcc)
-                dAcc = tAcc * (constrains.maxVel / 2)
-            } else {
-                tBrk = 0.0
-                dBrk = 0.0
-                tAcc = (constrains.maxVel - abs(oldVel)) / constrains.maxAcc
-                dAcc = tAcc * (constrains.maxVel + abs(oldVel)) / 2
-            }
-
-            dTot = abs(posRef - oldPos + signM * dBrk)
-
-            tDec = constrains.maxVel / constrains.maxAcc
-            dDec = tDec * constrains.maxVel / 2
-            dVel = dTot - (dAcc + dDec)
-            tVel = dVel / constrains.maxVel
+    var fullSpeedDist = 0.0
 
 
-            if (tVel > 0) shape = Shape.Trap
-            else {
-                shape = Shape.Tri
+    var endAcc = 0.0
+    var endFullSpeed = 0.0
+    var endDec = 0.0
 
-                if (signM != sign(oldVel)) {
-                    velSt = sqrt(constrains.maxAcc * dTot)
-                    tAcc = (velSt / constrains.maxAcc);
-                    dAcc = tAcc * (velSt / 2)
-                } else {
-                    tBrk = 0.0
-                    dBrk = 0.0
-                    dTot = abs(posRef - oldPos)
-                    velSt = sqrt(0.5 * oldVel * oldVel + constrains.maxAcc * dTot)
-                    tAcc = (velSt - abs(oldVel)) / constrains.maxAcc
-                    tAcc = tAcc * (velSt + abs(oldVel)) / 2
-                }
-                tDec = velSt / constrains.maxAcc
-                dDec = dDec * velSt / 2
-            }
+    var startTime = 0.0
+
+    fun updateState(i: ProfilePos, f: ProfilePos) {
+        initial = i
+        final = f
+        direction = if (shouldFlipAcc()) -1 else 1
+        initial = direct(initial)
+        final = direct(final)
+
+        cutoffBegin = initial.velocity / constrains.maxAcc
+        cutoffDistBegin = cutoffBegin * cutoffBegin * constrains.maxAcc / 2.0
+        cutoffEnd = final.velocity / constrains.maxAcc
+        cutoffDistEnd = cutoffEnd * cutoffEnd * constrains.maxAcc / 2.0
+
+        fullTrapDist =
+            cutoffDistBegin + (final.position - initial.position) + cutoffDistEnd
+        accTime = constrains.maxVel / constrains.maxAcc
+
+        fullSpeedDist =
+            fullTrapDist - accTime * accTime * constrains.maxAcc
+
+        if (fullSpeedDist < 0.0) {
+            accTime =
+                    sqrt(fullSpeedDist / constrains.maxAcc)
+            fullSpeedDist = 0.0
         }
 
-        val currentTIme = Timer.getFPGATimestamp()
-        dt = currentTIme - oldTime
-        calcProfile(posRef)
-        lastTime = currentTIme
-        return pos
+        endAcc = accTime - cutoffBegin
+        endFullSpeed = endAcc + fullSpeedDist / constrains.maxVel
+        endDec = endFullSpeed + accTime - cutoffEnd
+        startTime = Timer.getFPGATimestamp()
     }
 
-    fun calcProfile(posRef: Double) {
-        when (shape) {
-            Shape.Trap -> {
-                if (dt <= (tBrk + tAcc)) {
-                    pos = oldPos + oldVel * dt + signM * 0.5 * constrains.maxAcc * dt * dt
-                    vel = oldVel + signM * constrains.maxAcc * dt
-                    acc = signM * constrains.maxAcc
-                } else if (dt > (tBrk + tAcc) && dt < (tBrk + tAcc + tVel)) {
-                    pos = oldPos + signM * (-dBrk + dAcc + constrains.maxVel * (dt - dBrk - tAcc))
-                    vel = signM * constrains.maxVel;
-                    acc = 0.0
-                } else if (dt >= (dBrk + tAcc + tVel) && dt < (tBrk + tAcc + tVel + tDec)) {
-                    pos = oldPos + signM * (-dBrk + dAcc + dVel + constrains.maxVel * (dt - tBrk - tAcc - tVel) - 0.5 * constrains.maxAcc * (dt - tBrk - tAcc) * (dt - tBrk - tAcc));
-                    vel = signM * (constrains.maxVel - constrains.maxAcc * (dt - tBrk - tAcc - tVel));
-                    acc = -signM * constrains.maxAcc
-                } else {
-                    pos = posRef;
-                    vel = 0.0
-                    acc = 0.0
-                    isFinished = true;
-                }
-            }
-            Shape.Tri -> {
-                if (dt <= (tBrk + tAcc)) {
-                    pos = oldPos + oldVel * dt + signM * 0.5 * constrains.maxAcc * dt * dt
-                    vel = oldVel + signM * constrains.maxAcc * dt
-                    acc = signM * constrains.maxAcc;
-                } else if (dt > (tBrk + tAcc) && dt < (tBrk + tAcc + tDec)) {
-                    pos = oldPos + signM * (-dBrk + dAcc + velSt * (dt - tBrk - tAcc) - 0.5 * constrains.maxAcc * (dt - tBrk - tAcc) * (dt - tBrk - tAcc));
-                    vel = signM * (velSt - constrains.maxAcc * (dt - tBrk - tAcc));
-                    acc = -signM * constrains.maxAcc;
-                } else {
-                    pos = posRef;
-                    vel = 0.0;
-                    acc = 0.0
-                    isFinished = true;
-                }
-            }
+    fun calc(t: Double = Timer.getFPGATimestamp()): ProfilePos {
+        val time = startTime - t
+        var result: ProfilePos = initial
+
+        if (time < endAcc) {
+            result.velocity += time * constrains.maxAcc
+            result.position +=
+                    (initial.velocity + time * constrains.maxAcc / 2.0) * time
+        } else if (time < endFullSpeed) {
+            result.velocity = constrains.maxVel
+            result.position +=
+                    (initial.velocity + endAcc * constrains.maxAcc / 2.0) * endAcc + constrains.maxVel * (t - endAcc)
+        } else if (t <= endDec) {
+            result.velocity =
+                    final.velocity + (endDec - time) * constrains.maxAcc
+            val timeLeft = endDec - time
+            result.position =
+                    final.position - (final.velocity + timeLeft * constrains.maxAcc / 2.0) * timeLeft
+        } else {
+            result = final
         }
+
+        return direct(result)
+    }
+
+    fun direct(prof: ProfilePos): ProfilePos {
+        val result = prof
+        result.position *= this.direction
+        result.velocity *= this.direction
+        return result
+    }
+
+
+    fun shouldFlipAcc(c: Constrains = constrains,
+                      i: ProfilePos = initial,
+                      f: ProfilePos = final): Boolean {
+        val velChange = f.velocity - i.velocity
+        val distChange = f.position - i.position
+
+        val time = abs(velChange) / c.maxAcc
+        val shouldFlip = time * (velChange / 2 + i.velocity) > distChange
+        return shouldFlip
     }
 }
+
+

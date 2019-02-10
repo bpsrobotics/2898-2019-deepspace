@@ -8,7 +8,6 @@ import com.team2898.engine.math.linear.row
 import com.team2898.engine.motion.DriveSignal
 import com.team2898.engine.motion.TalonWrapper
 import com.team2898.engine.subsystems.DrivetrainLQR
-import com.team2898.robot.config.DrivetrainConf.*
 import com.team2898.robot.config.LEFT_MASTER
 import com.team2898.robot.config.LEFT_SLAVE
 import com.team2898.robot.config.RIGHT_MASTER
@@ -20,15 +19,14 @@ import kotlin.math.PI
 
 
 object Drivetrain: DrivetrainLQR() {
-    override var x: RealMatrix = Matrix(arrayOf(row(0.0, 0.0))).T
-    override val wheelbase: Double
-        get() = 2.0
+    override val wheelbase: Double = 2.0
 
-    override val A = Dt_A
-    override val B = Dt_B
-    override val Kc = Dt_Kc
-    override val Kff = Dt_Kff
-    override val M = Dt_M
+//    override val A = Dt_A
+//    override val B = Dt_B
+//    override val Kc = Dt_Kc
+//    override val Kff = Dt_Kff
+//    override val M = Dt_M
+
 
     val leftEnc = Encoder(0, 1)
     val rightEnc = Encoder(2, 3)
@@ -42,13 +40,17 @@ object Drivetrain: DrivetrainLQR() {
     val rightMaster = TalonWrapper(RIGHT_MASTER)
     val rightSlave = TalonWrapper(RIGHT_SLAVE)
 
+
     init {
         listOf(leftEnc, rightEnc).forEach {
             it.apply {
                 distancePerPulse = 6 * PI / 256 / 12
             }
         }
+        rightEnc.setReverseDirection(true)
 
+        rightSlave slaveTo rightMaster
+        leftSlave slaveTo leftMaster
         listOf(leftMaster, rightMaster).forEach {
             it.apply {
             }
@@ -59,6 +61,7 @@ object Drivetrain: DrivetrainLQR() {
             prevTime = Timer.getFPGATimestamp()
             prevDist = Pair(leftEnc.distance, rightEnc.distance)
             x = Matrix(arrayOf(row(leftVel, rightVel))).T
+            correctObserver()
         }.start()
     }
 

@@ -14,6 +14,7 @@ import com.team2898.engine.motion.DriveSignal
 import com.team2898.engine.motion.pathfinder.TrajPoint
 import com.team2898.robot.subsystem.Drivetrain
 import edu.wpi.first.wpilibj.command.Command
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 
 
 class PathFollower(val path: Array<TrajPoint>) : Command() {
@@ -37,6 +38,8 @@ class PathFollower(val path: Array<TrajPoint>) : Command() {
         )
         val ref = Matrix(Matrix(arrayOf(row(ramsete_ref.first, ramsete_ref.second))).T.data)
         val vols = Drivetrain.genU(ref)
+        SmartDashboard.putNumber("left V", vols[0, 0])
+        SmartDashboard.putNumber("right V", vols[1, 0])
         Drivetrain.step(vols)
 
         currentIndex++
@@ -45,8 +48,7 @@ class PathFollower(val path: Array<TrajPoint>) : Command() {
         // uncomment those for testing
 //        X.add(Drivetrain.state.pose.x)
 //        Y.add(Drivetrain.state.pose.y)
-
-        Drivetrain.openLoopPower(DriveSignal(left=vols[0, 0], right=vols[1, 0]))
+//        Drivetrain.openLoopPower(DriveSignal(left=vols[0, 0], right=vols[1, 0]))
     }
 
     override fun isFinished(): Boolean {
@@ -59,6 +61,7 @@ class PathFollower(val path: Array<TrajPoint>) : Command() {
 
     override fun start() {
         Drivetrain.encoders { reset() }
+        currentIndex = 0
         auto.start()
     }
 }

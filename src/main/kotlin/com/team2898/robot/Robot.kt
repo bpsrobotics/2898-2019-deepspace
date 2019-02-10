@@ -23,6 +23,8 @@ object Robot : TimedRobot() {
             SmartDashboard.putNumber("right vel", Drivetrain.x[1, 0])
             SmartDashboard.putNumber("left pos", Drivetrain.leftEnc.distance)
             SmartDashboard.putNumber("right pos", Drivetrain.rightEnc.distance)
+            SmartDashboard.putNumber("kalman left", Drivetrain.xHat[0, 0])
+            SmartDashboard.putNumber("kalman right", Drivetrain.xHat[1, 0])
         }.start()
     }
     val trajPoint: Array<TrajPoint>
