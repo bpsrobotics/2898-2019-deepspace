@@ -18,7 +18,7 @@ abstract class DrivetrainLQR {
     val Kff: Matrix = Dt_Kff
     val M: Matrix = Dt_M
 // TODO move this somewhere
-    
+
     var history = listOf<dtState>()
 
     data class dtState(var pose: RigidTransform2d, var vel: Twist2d, var time: Double)

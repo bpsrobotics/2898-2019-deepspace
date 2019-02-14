@@ -10,9 +10,7 @@ import kotlin.math.sqrt
 data class Constrains(val maxVel: Double, val maxAcc: Double)
 data class ProfilePos(var position: Double, var velocity: Double)
 
-class TrapezoidProfile(val constrains: Constrains,
-                       var initial: ProfilePos,
-                       var final: ProfilePos) {
+class TrapezoidProfile(val constrains: Constrains) {
 
     var direction = 0
     var cutoffBegin = 0.0
@@ -32,7 +30,11 @@ class TrapezoidProfile(val constrains: Constrains,
 
     var startTime = 0.0
 
+    var initial = ProfilePos(0.0, 0.0)
+    var final = initial
+
     fun updateState(i: ProfilePos, f: ProfilePos) {
+
         initial = i
         final = f
         direction = if (shouldFlipAcc()) -1 else 1

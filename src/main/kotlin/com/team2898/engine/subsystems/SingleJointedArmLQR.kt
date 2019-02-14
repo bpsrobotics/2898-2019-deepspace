@@ -13,14 +13,16 @@ abstract class SingleJointedArmLQR {
     val Kc = Arm_Kc
     val M = Arm_M
 
-    val dt = 0.01
+    val dt = 0.05
 
     fun clampU(u: Double) = clamp(u, 12.0)
 
     val C = Matrix(arrayOf(row(1.0, 0.0)))
     val D = Matrix(arrayOf(row(0.0)))
 
-    var x = Matrix(arrayOf(row(0.0), row(0.0))).T
+    var x = Matrix(arrayOf(row(0.0, 0.0))).T
+    var y = Matrix(arrayOf(row(0.0))).T
+
 
     var xHat = x
 
@@ -34,25 +36,33 @@ abstract class SingleJointedArmLQR {
         get() = MatrixUtils.inverse(A)
 
 
-    val kalmanGain = Arm_M
+    val kalmanGain = M
     val L = A * kalmanGain
 
 
     fun correctObserver() {
-        xHat += A_inv * L * (C * x - C * xHat - D * u)
+//        xHat += A_inv * L * (C * x - C * xHat - D * u)
+        xHat += kalmanGain * (y - C * xHat - D * u)
     }
 
     fun predictObserver() {
         xHat = A * xHat + B * u
     }
 
+    fun updatePlant() {
+        y = C * x + D * u
+    }
+
     fun genU(r: Matrix, ff: Boolean = true, x: RealMatrix = xHat): Matrix {
-        predictObserver()
-        val u_feedback = Matrix((Kc * (r - x)).data)
+        updatePlant()
+        correctObserver()
+        val u_feedback = Matrix((Kc * (r - xHat)).data)
         if (!ff) return u_feedback
 
         val u_feedforward = Kff * (r - A * r)
-        val u = Matrix((u_feedback + u_feedforward).data)
-        return u
+        val uReturn = Matrix((u_feedback + u_feedforward).data)
+        predictObserver()
+        u = uReturn
+        return uReturn
     }
 }

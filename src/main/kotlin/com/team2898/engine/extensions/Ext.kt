@@ -1,5 +1,6 @@
 package com.team2898.engine.extensions
 
+import edu.wpi.first.wpilibj.Encoder
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.annotations.TestOnly
@@ -28,3 +29,5 @@ fun Pair<Any, Any>.l() = first
 fun Pair<Any, Any>.r() = second
 
 fun Pair<Double, Double>.avg() = (first + second) / 2
+
+
