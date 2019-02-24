@@ -15,53 +15,34 @@ import com.team2898.engine.motion.pathfinder.TrajPoint
 import com.team2898.robot.subsystem.Drivetrain
 import edu.wpi.first.wpilibj.command.Command
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
+import jaci.pathfinder.Trajectory
 
 
-class PathFollower(val path: Array<TrajPoint>) : Command() {
+class PathFollower(val path: Pair<Trajectory, Trajectory>) : Command() {
 
-    val size = path.size
+    val size = path.first.length()
 
     var currentIndex = 0
 
-    val X = mutableListOf<Double>()
-    val Y = mutableListOf<Double>()
-
-    val auto = AsyncLooper(1/Drivetrain.dt){
-        val target = path[currentIndex]
-        val ramsete_ref = ramsete(
-                positionReference = RigidTransform2d(Translation2d(target.x, target.y), Rotation2d.createFromRadians(target.heading)),
-                velocityReference = Twist2d(target.vel, 0.0, target.angVel),
-                pose = Drivetrain.state.pose,
-                b = 0.6,
-                zeta = 0.9,
-                wheelbase = 2.0
-        )
-        val ref = Matrix(Matrix(arrayOf(row(ramsete_ref.first, ramsete_ref.second))).T.data)
-        val vols = Drivetrain.genU(ref)
-        SmartDashboard.putNumber("left V", vols[0, 0])
-        SmartDashboard.putNumber("right V", vols[1, 0])
-        Drivetrain.step(vols)
-
-        currentIndex++
-//        println("x: ${target.x}, y: ${target.y}, dtx: ${Drivetrain.state.pose.x}, dty: ${Drivetrain.state.pose.y}, dtv: ${Drivetrain.state.vel.dx}")
-
-        // uncomment those for testing
-//        X.add(Drivetrain.state.pose.x)
-//        Y.add(Drivetrain.state.pose.y)
-//        Drivetrain.openLoopPower(DriveSignal(left=vols[0, 0], right=vols[1, 0]))
-    }
-
-    override fun isFinished(): Boolean {
-        return currentIndex == size
+    override fun isFinished(): Boolean = currentIndex == size
+    override fun execute() {
+        println("exec")
+        val target = Pair(path.first[currentIndex], path.second[currentIndex])
+        val r = Matrix(Matrix(arrayOf(row(target.first.position, target.first.velocity, target.second.position, target.second.velocity))).T.data)
+        print(r)
+        val u = Drivetrain.genU(r,x= Drivetrain.x)
+        Drivetrain.openLoopPower(DriveSignal(u[0, 0], u[1, 0]))
+        currentIndex ++
     }
 
     override fun end() {
-        auto.stop()
+        println("ended")
     }
 
-    override fun start() {
+    override fun initialize() {
         Drivetrain.encoders { reset() }
         currentIndex = 0
-        auto.start()
+        println(size)
+        println(path.first.length())
     }
 }

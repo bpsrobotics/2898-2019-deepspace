@@ -6,6 +6,7 @@ import com.team2898.engine.logic.Subsystem
 import com.team2898.robot.OI
 import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
+import kotlinx.serialization.ImplicitReflectionSerializer
 
 
 object DiscBrake : Subsystem(50.0, "disc brake") {
@@ -14,9 +15,12 @@ object DiscBrake : Subsystem(50.0, "disc brake") {
 
     val brakeSelenoid = DoubleSolenoid(7, 2)
 
+//    val brake: Boolean
+//        get() = OI.opCtl.getRawButton(2)
 
-    fun brakeUpdate() {
-        if (Arm.brake) brakeSelenoid.set(DoubleSolenoid.Value.kForward)
+    @ImplicitReflectionSerializer
+    fun brakeUpdate(b: Boolean = Arm.brake) {
+        if (b) brakeSelenoid.set(DoubleSolenoid.Value.kForward)
         else brakeSelenoid.set(DoubleSolenoid.Value.kReverse)
     }
 }

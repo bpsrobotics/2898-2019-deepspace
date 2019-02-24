@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode
 import com.team2898.engine.async.AsyncLooper
 import com.team2898.engine.math.linear.Matrix
 import com.team2898.engine.math.linear.T
+import com.team2898.engine.math.linear.get
 import com.team2898.engine.math.linear.row
 import com.team2898.engine.motion.DriveSignal
 import com.team2898.engine.motion.TalonWrapper
@@ -14,19 +15,13 @@ import com.team2898.robot.config.RIGHT_MASTER
 import com.team2898.robot.config.RIGHT_SLAVE
 import edu.wpi.first.wpilibj.Encoder
 import edu.wpi.first.wpilibj.Timer
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import org.apache.commons.math3.linear.RealMatrix
 import kotlin.math.PI
 
 
 object Drivetrain: DrivetrainLQR() {
-    override val wheelbase: Double = 2.0
-
-//    override val A = Dt_A
-//    override val B = Dt_B
-//    override val Kc = Dt_Kc
-//    override val Kff = Dt_Kff
-//    override val M = Dt_M
-
+    val wheelbase: Double = 2.0
 
     val leftEnc = Encoder(0, 1)
     val rightEnc = Encoder(2, 3)
@@ -60,14 +55,21 @@ object Drivetrain: DrivetrainLQR() {
             val rightVel = (rightEnc.distance - prevDist.second) / (Timer.getFPGATimestamp() - prevTime)
             prevTime = Timer.getFPGATimestamp()
             prevDist = Pair(leftEnc.distance, rightEnc.distance)
-            x = Matrix(arrayOf(row(leftVel, rightVel))).T
-            correctObserver()
+            x = Matrix(arrayOf(row(leftEnc.distance, leftVel, rightEnc.distance, rightVel))).T
+            SmartDashboard.putNumber("left pos", x[0, 0])
+            SmartDashboard.putNumber("left vel", x[1, 0])
+            SmartDashboard.putNumber("right pos", x[2, 0])
+            SmartDashboard.putNumber("right vel", x[3, 0])
+            SmartDashboard.putNumber("left m A", leftMaster.outputCurrent)
+            SmartDashboard.putNumber("left s A", leftSlave.outputCurrent)
+            SmartDashboard.putNumber("right m A", rightMaster.outputCurrent)
+            SmartDashboard.putNumber("right s A", rightSlave.outputCurrent)
         }.start()
     }
 
     fun openLoopPower(driveSignal: DriveSignal) {
         leftMaster.set(ControlMode.PercentOutput, driveSignal.left)
-        rightMaster.set(ControlMode.PercentOutput, driveSignal.right)
+        rightMaster.set(ControlMode.PercentOutput, -driveSignal.right)
     }
 
     fun masters(block: TalonWrapper.() -> Unit) {

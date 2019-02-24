@@ -1,35 +1,45 @@
 package com.team2898.robot
 
-import com.ctre.phoenix.motorcontrol.ControlMode
+import com.team2898.robot.commands.Teleop
 import com.team2898.robot.subsystem.*
+import edu.wpi.first.cameraserver.CameraServer
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.TimedRobot
+import edu.wpi.first.wpilibj.command.Scheduler
 import kotlinx.serialization.ImplicitReflectionSerializer
 
 @ImplicitReflectionSerializer
 object Robot : TimedRobot() {
-
-
     override fun robotInit() {
-        DiscBrake
+        CameraServer.getInstance().startAutomaticCapture()
         Arm
-//        ArmBackup
+        Drivetrain
+        DiscBrake
+        Intake
+    }
+
+//    val auto = PathFollower(profile)
+
+    override fun autonomousInit() {
+    }
+
+    override fun autonomousPeriodic() {
     }
 
     override fun teleopInit() {
-//        Arm.updateTarget(0.5)
+        Teleop().start()
     }
 
     override fun teleopPeriodic() {
-//        Intake.hatch = OI.opCtl.getRawButton(3)
-//        Intake.cargoIntake(OI.opCtl.getRawAxis(5))
-//        Intake.hatchIntake()
-        Arm.talons(-3.8/12)
-        DiscBrake.brakeUpdate()
-//        if (OI.opCtl.getRawButton(0)) Arm.updateTarget(1.0)
-//        if (OI.opCtl.getRawButton(2)) Arm.updateTarget(-0.5)
-//        if (OI.opCtl.getRawButton(0)) Arm.updateTarget(-1.0)
-//        if (OI.opCtl.getRawButton(0)) Arm.updateTarget(1.5)
+        Scheduler.getInstance().run()
+    }
+
+    override fun disabledInit() {
+        DiscBrake.brakeUpdate(false)
+    }
+
+    override fun disabledPeriodic() {
+        DiscBrake.brakeUpdate(false)
     }
 }
 

@@ -4,7 +4,7 @@ import com.team2898.engine.motion.pathfinder.ProfileSettings
 import jaci.pathfinder.Trajectory
 
 val testAuto = ProfileSettings(
-        hz = 100,
+        hz = 50,
         maxVel = 10.0,
         maxAcc = 5.00,
         maxJerk = 5.0,

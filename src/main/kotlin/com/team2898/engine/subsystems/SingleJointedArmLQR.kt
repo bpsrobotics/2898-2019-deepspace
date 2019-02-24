@@ -32,12 +32,8 @@ abstract class SingleJointedArmLQR {
             field = value
         }
 
-    val A_inv
-        get() = MatrixUtils.inverse(A)
-
 
     val kalmanGain = M
-    val L = A * kalmanGain
 
 
     fun correctObserver() {
@@ -56,9 +52,8 @@ abstract class SingleJointedArmLQR {
     fun genU(r: Matrix, ff: Boolean = true, x: RealMatrix = xHat): Matrix {
         updatePlant()
         correctObserver()
-        val u_feedback = Matrix((Kc * (r - xHat)).data)
+        val u_feedback = Matrix((Kc * (r - x)).data)
         if (!ff) return u_feedback
-
         val u_feedforward = Kff * (r - A * r)
         val uReturn = Matrix((u_feedback + u_feedforward).data)
         predictObserver()

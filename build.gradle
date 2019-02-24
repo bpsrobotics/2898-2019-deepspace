@@ -6,6 +6,7 @@ buildscript {
         jcenter()
         maven { url "http://dl.bintray.com/jetbrains/spek" }
         maven { url "https://kotlin.bintray.com/kotlinx" }
+//        maven { url "https://jitpack.io" }
     }
 
     dependencies {
@@ -66,6 +67,7 @@ repositories {
     jcenter()
     mavenCentral()
     maven { url "https://kotlin.bintray.com/kotlinx" }
+//    maven { url "https://jitpack.io" }
 }
 
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
@@ -85,6 +87,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.10.0"
     testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.2.1'
+//    compile "org.ghrobotics:FalconLibrary:2019.2.23"
 
 //    compile "com.github.salomonbrys.kotson:kotson:2.5.0"
 }

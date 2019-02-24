@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode
 import com.ctre.phoenix.motorcontrol.FeedbackDevice
 import com.team254.lib.util.motion.*
 import com.team2898.engine.async.AsyncLooper
+import com.team2898.engine.math.clamp
 import com.team2898.engine.math.linear.Matrix
 import com.team2898.engine.math.linear.T
 import com.team2898.engine.math.linear.get
@@ -21,6 +22,7 @@ import edu.wpi.first.wpilibj.Talon
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.cos
 
 object Arm : SingleJointedArmLQR() {
@@ -29,7 +31,7 @@ object Arm : SingleJointedArmLQR() {
     var prevTime = 0.0
     var prevVel = 0.0
     var acc = 0.0
-    val constrains = MotionProfileConstraints(3.0, 1.0)
+    val constrains = MotionProfileConstraints(2.0, 1.0)
 
     val leftMaster = TalonWrapper(ARM_LEFT_MASTER)
     val leftSlace = TalonWrapper(ARM_LEFT_SLAVE)
@@ -37,7 +39,7 @@ object Arm : SingleJointedArmLQR() {
     val rightSlave = TalonWrapper(ARM_RIGHT_SLAVE)
 
     var brake: Boolean = false
-//        get() = Timer.getFPGATimestamp() >= profile.endTime()
+        get() = Timer.getFPGATimestamp() >= profile.endTime()
 
     var target: Double = 0.0
 
@@ -61,23 +63,30 @@ object Arm : SingleJointedArmLQR() {
 
         armEnc.distancePerPulse = ((22 / 60.0) * 2 * PI) / 600.0 // rad
 
-//        leftSlace slaveTo leftMaster
-//        rightMaster slaveTo leftMaster
-//        rightSlave slaveTo leftMaster
+        leftSlace slaveTo leftMaster
+        rightMaster slaveTo leftMaster
+        rightSlave slaveTo leftMaster
+
 
         listOf(leftMaster, leftSlace, rightSlave, rightMaster).forEach {
             it.apply {
+                configContinuousCurrentLimit(35)
+                configPeakCurrentLimit(40)
                 configVoltageCompSaturation(12.0)
             }
         }
 
-        AsyncLooper(50.0) {
+        AsyncLooper(100.0) {
             val armVel = (armEnc.distance - prevDist) / (Timer.getFPGATimestamp() - prevTime)
             acc = (armVel - prevVel) / (Timer.getFPGATimestamp() - prevTime)
             prevTime = Timer.getFPGATimestamp()
             prevDist = armEnc.distance
             x = Matrix(arrayOf(row(armEnc.distance, armVel))).T
+        }.start()
+
+        AsyncLooper(50.0) {
             SmartDashboard.putNumber("arm pos", x[0, 0] + ARM_OFFSET)
+            SmartDashboard.putNumber("arm pos raw", x[0, 0])
             SmartDashboard.putNumber("arm vel", x[1, 0])
             SmartDashboard.putNumber("arm raw", armEnc.get().toDouble())
             SmartDashboard.putNumber("arm dist raw", armEnc.distance)
@@ -88,18 +97,16 @@ object Arm : SingleJointedArmLQR() {
             SmartDashboard.putNumber("Kf", -ARM_KF * cos(x[0, 0] + ARM_OFFSET))
         }.start()
 
-
         // Control Loop
-        AsyncLooper(50.0) {
+        AsyncLooper(100.0) {
             val currentTime = Timer.getFPGATimestamp()
             val state = profile.stateByTimeClamped(currentTime)
             val r = Matrix(Matrix(arrayOf(row(state.pos(), state.vel()))).T.data)
             val voltage = Arm.genU(r)[0, 0]
-            val outPutVoltage = voltage + ARM_KF * cos(x[0, 0] + ARM_OFFSET)
-            if (!brake) talons(clampU(-outPutVoltage / 12))
-            else talons(0.0)
-            println("$currentTime, $target, ${x[0, 0]}, ${x[1, 0]}, ${xHat[0, 0]}, ${xHat[1, 0]}, $voltage")
-        }
+            val outPutVoltage = voltage + (ARM_KF * cos(x[0, 0] - ARM_OFFSET))
+            if (!brake) leftMaster.set(ControlMode.PercentOutput, clampU(-outPutVoltage / 12))
+            else (leftMaster.set(ControlMode.PercentOutput, 0.0))
+        }.start()
     }
 
     fun talons(value: Double) {
@@ -112,8 +119,9 @@ object Arm : SingleJointedArmLQR() {
 
 
     fun updateTarget(targetPos: Double) {
+        if (target == targetPos) return
         target = targetPos
-        profile = MotionProfileGenerator.generateProfile(constrains, MotionProfileGoal(targetPos - ARM_OFFSET), currentPos)
+        profile = MotionProfileGenerator.generateProfile(constrains, MotionProfileGoal(targetPos), currentPos)
     }
 
     fun resetEncoder() {
