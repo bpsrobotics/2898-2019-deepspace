@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode
 import com.ctre.phoenix.motorcontrol.FeedbackDevice
 import com.team254.lib.util.motion.*
 import com.team2898.engine.async.AsyncLooper
+import com.team2898.engine.async.NotifierLooper
 import com.team2898.engine.math.clamp
 import com.team2898.engine.math.linear.Matrix
 import com.team2898.engine.math.linear.T
@@ -98,7 +99,7 @@ object Arm : SingleJointedArmLQR() {
         }.start()
 
         // Control Loop
-        AsyncLooper(100.0) {
+        NotifierLooper(100.0) {
             val currentTime = Timer.getFPGATimestamp()
             val state = profile.stateByTimeClamped(currentTime)
             val r = Matrix(Matrix(arrayOf(row(state.pos(), state.vel()))).T.data)

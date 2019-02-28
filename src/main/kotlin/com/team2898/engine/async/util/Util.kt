@@ -14,7 +14,7 @@ fun go(
         throwOnException: Boolean = true,
         block: suspend () -> Unit
 ): Job =
-        launch(pool, if (lazy) CoroutineStart.LAZY else CoroutineStart.DEFAULT) {
+        GlobalScope.launch(pool, if (lazy) CoroutineStart.LAZY else CoroutineStart.DEFAULT) {
             try {
                 block()
             } catch (e: Exception) {

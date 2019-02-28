@@ -6,6 +6,7 @@ import com.team2898.engine.logging.TimeBombAsync
 import com.team2898.engine.logging.reflectLocation
 import edu.wpi.first.wpilibj.Timer
 import kotlinx.coroutines.*
+import java.util.concurrent.Executors
 
 class AsyncLooper(
         var hz: Double,
@@ -17,7 +18,7 @@ class AsyncLooper(
     var job: Job = init()
 
     private fun init(): Job {
-        return launch(CommonPool, CoroutineStart.LAZY) {
+        return GlobalScope.launch(Executors.newFixedThreadPool(2).asCoroutineDispatcher(), start = CoroutineStart.LAZY) {
             while (isActive) {
                 val startTime = Timer.getFPGATimestamp()
                 func()
@@ -45,5 +46,4 @@ class AsyncLooper(
     private fun logCantKeepUp(lastTime: Double) {
         Logger.logInfo(reflectLocation(), LogLevel.WARNING, "AsyncLooper cannot keep up! Running at $hz hz and previous loop took ${lastTime * 1000} ms")
     }
-
 }
