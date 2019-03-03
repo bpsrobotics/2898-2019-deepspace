@@ -11,11 +11,11 @@ import kotlinx.serialization.ImplicitReflectionSerializer
 @ImplicitReflectionSerializer
 object Robot : TimedRobot() {
     override fun robotInit() {
-        CameraServer.getInstance().startAutomaticCapture()
-        Arm
-        Drivetrain
-        DiscBrake
-        Intake
+//        CameraServer.getInstance().startAutomaticCapture()
+//        Arm
+//        Drivetrain
+//        DiscBrake
+//        Intake
     }
 
 //    val auto = PathFollower(profile)
@@ -27,19 +27,19 @@ object Robot : TimedRobot() {
     }
 
     override fun teleopInit() {
-        Teleop().start()
+//        Teleop().start()
     }
 
     override fun teleopPeriodic() {
-        Scheduler.getInstance().run()
+//        Scheduler.getInstance().run()
     }
 
     override fun disabledInit() {
-        DiscBrake.brakeUpdate(false)
+//        DiscBrake.brakeUpdate(false)
     }
 
     override fun disabledPeriodic() {
-        DiscBrake.brakeUpdate(false)
+//        DiscBrake.brakeUpdate(false)
     }
 }
 
