@@ -2,6 +2,7 @@ package com.team2898.robot.subsystem
 
 import com.ctre.phoenix.motorcontrol.ControlMode
 import com.team2898.engine.async.AsyncLooper
+import com.team2898.engine.async.NotifierLooper
 import com.team2898.engine.math.linear.Matrix
 import com.team2898.engine.math.linear.T
 import com.team2898.engine.math.linear.get
@@ -35,10 +36,14 @@ object Drivetrain: DrivetrainLQR() {
     val rightMaster = TalonWrapper(RIGHT_MASTER)
     val rightSlave = TalonWrapper(RIGHT_SLAVE)
 
+    var r = Matrix(arrayOf(row(0.0, 0.0))).T
+
 
     init {
+        x = Matrix(arrayOf(row(0.0, 0.0))).T
         listOf(leftEnc, rightEnc).forEach {
             it.apply {
+
                 distancePerPulse = 6 * PI / 256 / 12
             }
         }
@@ -55,21 +60,26 @@ object Drivetrain: DrivetrainLQR() {
             val rightVel = (rightEnc.distance - prevDist.second) / (Timer.getFPGATimestamp() - prevTime)
             prevTime = Timer.getFPGATimestamp()
             prevDist = Pair(leftEnc.distance, rightEnc.distance)
-            x = Matrix(arrayOf(row(leftEnc.distance, leftVel, rightEnc.distance, rightVel))).T
-            SmartDashboard.putNumber("left pos", x[0, 0])
-            SmartDashboard.putNumber("left vel", x[1, 0])
-            SmartDashboard.putNumber("right pos", x[2, 0])
-            SmartDashboard.putNumber("right vel", x[3, 0])
+            x = Matrix(arrayOf(row(leftVel, rightVel))).T
+            SmartDashboard.putNumber("left vel", x[0, 0])
+            SmartDashboard.putNumber("right vel", x[1, 0])
             SmartDashboard.putNumber("left m A", leftMaster.outputCurrent)
             SmartDashboard.putNumber("left s A", leftSlave.outputCurrent)
             SmartDashboard.putNumber("right m A", rightMaster.outputCurrent)
             SmartDashboard.putNumber("right s A", rightSlave.outputCurrent)
+        }.start()
+
+        NotifierLooper(100.0) {
+            openLoopPower(genU(Matrix(r.data), x = x))
         }.start()
     }
 
     fun openLoopPower(driveSignal: DriveSignal) {
         leftMaster.set(ControlMode.PercentOutput, driveSignal.left)
         rightMaster.set(ControlMode.PercentOutput, -driveSignal.right)
+    }
+    fun openLoopPower(vels: RealMatrix) {
+        openLoopPower(driveSignal = DriveSignal(vels[0, 0], vels[1, 0]))
     }
 
     fun masters(block: TalonWrapper.() -> Unit) {

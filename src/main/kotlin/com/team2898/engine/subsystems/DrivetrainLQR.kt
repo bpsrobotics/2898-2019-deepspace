@@ -15,14 +15,14 @@ abstract class DrivetrainLQR {
     val Kc = Dt_Kc
     val M = Dt_M
 
-    val dt = 0.05
+    val dt = 0.01
 
     fun clampU(u: Double) = clamp(u, 12.0)
 
-    val C = Matrix(arrayOf(row(1.0, 0.0, 0.0, 0.0), row(0.0, 0.0, 1.0, 0.0)))
+    val C = Matrix(arrayOf(row(1.0, 0.0), row(0.0, 1.0)))
     val D = Matrix(arrayOf(row(0.0, 0.0), row(0.0, 0.0)))
 
-    var x = Matrix(arrayOf(row(0.0, 0.0, 0.0, 0.0))).T
+    var x = Matrix(arrayOf(row(0.0, 0.0))).T
     var y = Matrix(arrayOf(row(0.0, 0.0))).T
 
 
