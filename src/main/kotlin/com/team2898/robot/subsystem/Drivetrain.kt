@@ -43,7 +43,6 @@ object Drivetrain: DrivetrainLQR() {
         x = Matrix(arrayOf(row(0.0, 0.0))).T
         listOf(leftEnc, rightEnc).forEach {
             it.apply {
-
                 distancePerPulse = 6 * PI / 256 / 12
             }
         }
@@ -55,7 +54,7 @@ object Drivetrain: DrivetrainLQR() {
             it.apply {
             }
         }
-        AsyncLooper(50.0) {
+        AsyncLooper(100.0) {
             val leftVel = (leftEnc.distance - prevDist.first) / (Timer.getFPGATimestamp() - prevTime)
             val rightVel = (rightEnc.distance - prevDist.second) / (Timer.getFPGATimestamp() - prevTime)
             prevTime = Timer.getFPGATimestamp()

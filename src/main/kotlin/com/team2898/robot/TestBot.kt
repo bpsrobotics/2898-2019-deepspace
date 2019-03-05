@@ -5,6 +5,8 @@ import com.team2898.robot.commands.testbot.TestTeleop
 import com.team2898.robot.motion.Constants.kDriveBeta
 import com.team2898.robot.motion.Constants.kDriveZeta
 import com.team2898.robot.motion.Trajectories
+import com.team2898.robot.subsystem.Drivetrain
+import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.TimedRobot
 import edu.wpi.first.wpilibj.Timer
@@ -43,6 +45,10 @@ object TestBot: TimedRobot() {
 //        }
 //
 //    }
+
+    override fun robotInit() {
+        Drivetrain
+    }
 
     override fun teleopInit() {
         TestTeleop().start()

@@ -5,6 +5,7 @@ import com.team2898.engine.math.clamp
 import com.team2898.engine.math.linear.*
 import com.team2898.robot.config.ArmConf.*
 import com.team2898.robot.config.DrivetrainConf.*
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import org.apache.commons.math3.linear.MatrixUtils
 import org.apache.commons.math3.linear.RealMatrix
 
@@ -28,9 +29,10 @@ abstract class DrivetrainLQR {
 
     var xHat = x
 
-    var u = Matrix(arrayOf(row(0.0))).T
+    var u = Matrix(arrayOf(row(0.0, 0.0))).T
         set(value) {
             value[0, 0] = clampU(value[0, 0])
+            value[1, 0] = clampU(value[1, 0])
             field = value
         }
 
@@ -54,7 +56,7 @@ abstract class DrivetrainLQR {
     fun genU(r_ft: Matrix, ff: Boolean = true, x: RealMatrix = xHat): Matrix {
         val r = r_ft.scalarMultiply(0.3048)
         val xM = x.scalarMultiply(0.3048)
-        updatePlant()
+//        updatePlant()
         correctObserver()
         val u_feedback = Matrix((Kc * (r - xM)).data)
         if (!ff) return u_feedback

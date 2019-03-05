@@ -11,12 +11,6 @@ import kotlin.math.sign
 
 object OI {
 
-    init {
-        AsyncLooper(50.0) {
-            SmartDashboard.putNumber("pov", opCtl.povCount.toDouble())
-            SmartDashboard.putNumber("pov get", opCtl.pov.toDouble())
-        }.start()
-    }
 
     fun deadzone(value: Double): Double {
         if (abs(value) < 0.10) return 0.0
