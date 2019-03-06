@@ -3,7 +3,13 @@ package com.team2898.robot.commands.testbot
 import com.team2898.engine.math.linear.Matrix
 import com.team2898.engine.math.linear.T
 import com.team2898.engine.math.linear.row
+import com.team2898.engine.motion.CheesyDrive
 import com.team2898.robot.OI
+import com.team2898.robot.OI.leftTrigger
+import com.team2898.robot.OI.quickTurn
+import com.team2898.robot.OI.rightTrigger
+import com.team2898.robot.OI.throttle
+import com.team2898.robot.OI.turn
 import com.team2898.robot.subsystem.Drivetrain
 import edu.wpi.first.wpilibj.command.Command
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
@@ -18,12 +24,13 @@ class TestTeleop: Command() {
     }
 
     override fun execute() {
-        val ang = OI.turn * 3
-        val linear = OI.throttle * 10 - ang * 2
-        val left = (-(ang * 1.9) + (2 * linear)) / 2
-        val right = ((ang * 1.9) + (2 * linear)) / 2
-        Drivetrain.r = Matrix(arrayOf(row(left), row(right)))
-//        SmartDashboard.putNumber("left", left)
-//        SmartDashboard.putNumber("right", right)
+        Drivetrain.openLoopPower(
+                CheesyDrive.updateCheesy(
+                        (if (!quickTurn) turn else -leftTrigger + rightTrigger),
+                        -throttle, // Remove "-" if robot goes backwards
+                        quickTurn,
+                        true
+                )
+        )
     }
 }

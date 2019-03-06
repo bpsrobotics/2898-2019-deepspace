@@ -18,6 +18,8 @@ import edu.wpi.first.wpilibj.Encoder
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import org.apache.commons.math3.linear.RealMatrix
+import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
+import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
 import kotlin.math.PI
 
 
@@ -40,6 +42,7 @@ object Drivetrain: DrivetrainLQR() {
 
 
     init {
+
         x = Matrix(arrayOf(row(0.0, 0.0))).T
         listOf(leftEnc, rightEnc).forEach {
             it.apply {
@@ -70,12 +73,12 @@ object Drivetrain: DrivetrainLQR() {
 
         NotifierLooper(100.0) {
             openLoopPower(genU(Matrix(r.data), x = x))
-        }.start()
+        }
     }
 
     fun openLoopPower(driveSignal: DriveSignal) {
-        leftMaster.set(ControlMode.PercentOutput, driveSignal.left)
-        rightMaster.set(ControlMode.PercentOutput, -driveSignal.right)
+        leftMaster.set(ControlMode.PercentOutput, driveSignal.left) // change the sign if left is going back
+        rightMaster.set(ControlMode.PercentOutput, -driveSignal.right) // change the sign if right is going back
     }
     fun openLoopPower(vels: RealMatrix) {
         openLoopPower(driveSignal = DriveSignal(vels[0, 0], vels[1, 0]))

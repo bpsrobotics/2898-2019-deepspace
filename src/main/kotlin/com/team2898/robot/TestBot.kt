@@ -1,6 +1,7 @@
 package com.team2898.robot
 
 import com.team2898.robot.commands.Teleop
+import com.team2898.robot.commands.testbot.TestAuto
 import com.team2898.robot.commands.testbot.TestTeleop
 import com.team2898.robot.motion.Constants.kDriveBeta
 import com.team2898.robot.motion.Constants.kDriveZeta
@@ -23,28 +24,6 @@ import org.ghrobotics.lib.mathematics.units.feet
 import org.ghrobotics.lib.mathematics.units.second
 
 object TestBot: TimedRobot() {
-//    val path = Trajectories.testPath
-//    val tracker = RamseteTracker(kDriveBeta, kDriveZeta)
-//    var i = 0.0
-//    val dt = 0.01
-//    var prevPos = Pose2d(0.0.feet, 0.0.feet, 0.0.degree)
-//
-//    init {
-//        val xList = arrayListOf<Double>()
-//        val yList = arrayListOf<Double>()
-//
-//        val refXList = arrayListOf<Double>()
-//        val refYList = arrayListOf<Double>()
-//
-//        tracker.reset(path)
-//
-//        while (!tracker.isFinished) {
-//            val ref = tracker.nextState(prevPos, i.second)
-//            prevPos = tracker.referencePoint!!.state.state.pose
-//            println("lin ${ref.linearVelocity}, ang. ${ref.angularVelocity}")
-//        }
-//
-//    }
 
     override fun robotInit() {
         Drivetrain
@@ -52,6 +31,12 @@ object TestBot: TimedRobot() {
 
     override fun teleopInit() {
         TestTeleop().start()
+    }
+
+    override fun autonomousInit() {
+    }
+
+    override fun autonomousPeriodic() {
     }
 
     override fun teleopPeriodic() {

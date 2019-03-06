@@ -164,7 +164,7 @@ object Trajectories {
 
     val testPath = waypoints(
             Pose2d(0.0.feet, 0.0.feet, 0.0.degree),
-            Pose2d(0.0.feet, 8.0.feet, 0.0.degree)
+            Pose2d(0.0.feet, 3.0.feet, 0.0.degree)
     ).generateTrajectory("test", false)
 
     private fun waypoints(vararg waypoints: Pose2d) = listOf(*waypoints)
