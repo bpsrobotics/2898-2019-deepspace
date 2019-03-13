@@ -1,12 +1,8 @@
 package com.team2898.engine.subsystems
 
-
 import com.team2898.engine.math.clamp
 import com.team2898.engine.math.linear.*
-import com.team2898.robot.config.ArmConf.*
 import com.team2898.robot.config.DrivetrainConf.*
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
-import org.apache.commons.math3.linear.MatrixUtils
 import org.apache.commons.math3.linear.RealMatrix
 
 abstract class DrivetrainLQR {
@@ -36,7 +32,6 @@ abstract class DrivetrainLQR {
             field = value
         }
 
-
     val kalmanGain = M
 
 
@@ -53,15 +48,12 @@ abstract class DrivetrainLQR {
         y = C * x + D * u
     }
 
-    fun genU(r_ft: Matrix, ff: Boolean = true, x: RealMatrix = xHat): Matrix {
-        val r = r_ft.scalarMultiply(0.3048)
-        val xM = x.scalarMultiply(0.3048)
-//        updatePlant()
+    fun genU(r: Matrix, r_next: Matrix = r, ff: Boolean = true, x: RealMatrix = xHat): Matrix {
+        updatePlant()
         correctObserver()
-        val u_feedback = Matrix((Kc * (r - xM)).data)
+        val u_feedback = Matrix((Kc * (r - x)).data)
         if (!ff) return u_feedback
-
-        val u_feedforward = Kff * (r - A * r)
+        val u_feedforward = Kff * (r_next - A * r)
         val uReturn = Matrix((u_feedback + u_feedforward).data)
         predictObserver()
         u = uReturn

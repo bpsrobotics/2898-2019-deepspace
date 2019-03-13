@@ -3,10 +3,7 @@ package com.team2898.robot.subsystem
 import com.ctre.phoenix.motorcontrol.ControlMode
 import com.team2898.engine.async.AsyncLooper
 import com.team2898.engine.async.NotifierLooper
-import com.team2898.engine.math.linear.Matrix
-import com.team2898.engine.math.linear.T
-import com.team2898.engine.math.linear.get
-import com.team2898.engine.math.linear.row
+import com.team2898.engine.math.linear.*
 import com.team2898.engine.motion.DriveSignal
 import com.team2898.engine.motion.TalonWrapper
 import com.team2898.engine.subsystems.DrivetrainLQR
@@ -65,15 +62,13 @@ object Drivetrain: DrivetrainLQR() {
             x = Matrix(arrayOf(row(leftVel, rightVel))).T
             SmartDashboard.putNumber("left vel", x[0, 0])
             SmartDashboard.putNumber("right vel", x[1, 0])
-            SmartDashboard.putNumber("left m A", leftMaster.outputCurrent)
-            SmartDashboard.putNumber("left s A", leftSlave.outputCurrent)
-            SmartDashboard.putNumber("right m A", rightMaster.outputCurrent)
-            SmartDashboard.putNumber("right s A", rightSlave.outputCurrent)
+            SmartDashboard.putNumber("left U", u[0, 0])
+            SmartDashboard.putNumber("right U", u[1, 0])
         }.start()
+    }
 
-        NotifierLooper(100.0) {
-            openLoopPower(genU(Matrix(r.data), x = x))
-        }
+    val looper = NotifierLooper(100.0) {
+        openLoopPower(genU(Matrix(r.data), x = x))
     }
 
     fun openLoopPower(driveSignal: DriveSignal) {
@@ -81,7 +76,9 @@ object Drivetrain: DrivetrainLQR() {
         rightMaster.set(ControlMode.PercentOutput, -driveSignal.right) // change the sign if right is going back
     }
     fun openLoopPower(vels: RealMatrix) {
-        openLoopPower(driveSignal = DriveSignal(vels[0, 0], vels[1, 0]))
+        vels[0, 0] = clampU(vels[0, 0])
+        vels[1, 0] = clampU(vels[1, 0])
+        openLoopPower(driveSignal = DriveSignal(vels[0, 0]/12, vels[1, 0]/12))
     }
 
     fun masters(block: TalonWrapper.() -> Unit) {

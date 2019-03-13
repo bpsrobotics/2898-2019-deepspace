@@ -16,6 +16,7 @@ object Intake: Subsystem(50.0, "intake") {
     override val enableTimes: List<GamePeriods> = listOf(GamePeriods.TELEOP, GamePeriods.AUTO)
 
     val hatchSelenoid = DoubleSolenoid(0, 1)
+    val shooter = DoubleSolenoid(5, 6)
     val cargoTalon = TalonWrapper(CARGOINTAKE)
 
     var isCargoIn = true
@@ -29,21 +30,18 @@ object Intake: Subsystem(50.0, "intake") {
         }.start()
 
         AsyncLooper(50.0) {
-//            if (!isCargoIn) {
-//                cargoTalon.set(ControlMode.PercentOutput, -0.3)
-//                isCargoIn = cargoTalon.outputCurrent > 4.0
-//            } else cargoTalon.set(ControlMode.PercentOutput, OI.opCtl.getRawAxis(1))
+            if (OI.opCtl.getRawButton(1)) {
+                shooter.set(DoubleSolenoid.Value.kReverse)
+            } else {
+                shooter.set(DoubleSolenoid.Value.kForward)
+            }
+            if (OI.opCtl.getRawButton(2)) {
+                hatchSelenoid.set(DoubleSolenoid.Value.kReverse)
+            } else {
+                hatchSelenoid.set(DoubleSolenoid.Value.kForward)
+            }
             cargoTalon.set(ControlMode.PercentOutput, -1 * OI.opCtl.getRawAxis(1))
         }.start()
     }
 
-    fun hatchIntake() {
-        if (hatch) hatchSelenoid.set(DoubleSolenoid.Value.kReverse)
-        else hatchSelenoid.set(DoubleSolenoid.Value.kForward)
-    }
-
-
-    fun cargoReset() {
-        isCargoIn = false
-    }
 }

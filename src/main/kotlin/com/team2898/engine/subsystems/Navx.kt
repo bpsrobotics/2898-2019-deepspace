@@ -25,6 +25,11 @@ object Navx : ISelfCheck, ILooper {
             smartDashboard.putNumber("Navx rotation", rotation.degrees)
         }
 
+    val looper = AsyncLooper(50.0) {
+        smartDashboard.putNumber("Navx yaw", yaw)
+        smartDashboard.putNumber("Navx yaw rate", yawRate)
+        smartDashboard.putNumber("Navx rotation", rotation.degrees)
+    }.start()
 
     override val enableTimes = listOf(GamePeriods.AUTO, GamePeriods.TELEOP)
 

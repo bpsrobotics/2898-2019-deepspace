@@ -30,8 +30,8 @@ class PathFollower(val path: Pair<Trajectory, Trajectory>) : Command() {
         val target = Pair(path.first[currentIndex], path.second[currentIndex])
         val r = Matrix(Matrix(arrayOf(row(target.first.position, target.first.velocity, target.second.position, target.second.velocity))).T.data)
         print(r)
-        val u = Drivetrain.genU(r,x= Drivetrain.x)
-        Drivetrain.openLoopPower(DriveSignal(u[0, 0], u[1, 0]))
+//        val u = Drivetrain.genU(r,x= Drivetrain.x)
+//        Drivetrain.openLoopPower(DriveSignal(u[0, 0], u[1, 0]))
         currentIndex ++
     }
 

@@ -18,11 +18,15 @@ val Dt_Kc = Matrix(arrayOf(
         row(-1.31590195,  8.10889379)
 ))
 
-val Dt_Kff = Matrix(arrayOf(
-        row(3.71992519, 1.90743371),
-        row(1.90743371, 3.71992519)
-))
+//val Dt_Kff = Matrix(arrayOf(
+//        row(3.71992519, 1.90743371),
+//        row(1.90743371, 3.71992519)
+//))
 
+val Dt_Kff = Matrix(arrayOf(
+        row(47.41310545, -30.17970195),
+        row(-30.17970195, 47.41310545)
+))
 val Dt_M = Matrix(arrayOf(
         row(9.99999000e-01, -1.08062746e-13),
         row(-1.08062746e-13,  9.99999000e-01)
