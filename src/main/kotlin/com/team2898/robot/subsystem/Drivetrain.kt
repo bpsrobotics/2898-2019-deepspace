@@ -23,8 +23,8 @@ import kotlin.math.PI
 object Drivetrain: DrivetrainLQR() {
     val wheelbase: Double = 2.0
 
-    val leftEnc = Encoder(0, 1)
-    val rightEnc = Encoder(2, 3)
+//    val leftEnc = Encoder(0, 1)
+//    val rightEnc = Encoder(2, 3)
 
     var prevTime = Timer.getFPGATimestamp()
     var prevDist = Pair(0.0, 0.0)
@@ -41,12 +41,12 @@ object Drivetrain: DrivetrainLQR() {
     init {
 
         x = Matrix(arrayOf(row(0.0, 0.0))).T
-        listOf(leftEnc, rightEnc).forEach {
-            it.apply {
-                distancePerPulse = 6 * PI / 256 / 12
-            }
-        }
-        rightEnc.setReverseDirection(true)
+//        listOf(leftEnc, rightEnc).forEach {
+//            it.apply {
+//                distancePerPulse = 6 * PI / 256 / 12
+//            }
+//        }
+//        rightEnc.setReverseDirection(true)
 
         rightSlave slaveTo rightMaster
         leftSlave slaveTo leftMaster
@@ -54,17 +54,17 @@ object Drivetrain: DrivetrainLQR() {
             it.apply {
             }
         }
-        AsyncLooper(100.0) {
-            val leftVel = (leftEnc.distance - prevDist.first) / (Timer.getFPGATimestamp() - prevTime)
-            val rightVel = (rightEnc.distance - prevDist.second) / (Timer.getFPGATimestamp() - prevTime)
-            prevTime = Timer.getFPGATimestamp()
-            prevDist = Pair(leftEnc.distance, rightEnc.distance)
-            x = Matrix(arrayOf(row(leftVel, rightVel))).T
-            SmartDashboard.putNumber("left vel", x[0, 0])
-            SmartDashboard.putNumber("right vel", x[1, 0])
-            SmartDashboard.putNumber("left U", u[0, 0])
-            SmartDashboard.putNumber("right U", u[1, 0])
-        }.start()
+//        AsyncLooper(100.0) {
+//            val leftVel = (leftEnc.distance - prevDist.first) / (Timer.getFPGATimestamp() - prevTime)
+//            val rightVel = (rightEnc.distance - prevDist.second) / (Timer.getFPGATimestamp() - prevTime)
+//            prevTime = Timer.getFPGATimestamp()
+//            prevDist = Pair(leftEnc.distance, rightEnc.distance)
+//            x = Matrix(arrayOf(row(leftVel, rightVel))).T
+//            SmartDashboard.putNumber("left vel", x[0, 0])
+//            SmartDashboard.putNumber("right vel", x[1, 0])
+//            SmartDashboard.putNumber("left U", u[0, 0])
+//            SmartDashboard.putNumber("right U", u[1, 0])
+//        }.start()
     }
 
     val looper = NotifierLooper(100.0) {
@@ -88,8 +88,8 @@ object Drivetrain: DrivetrainLQR() {
     }
 
     fun encoders(block: Encoder.() -> Unit) {
-        listOf(leftEnc, rightEnc).forEach {
-            it.apply(block)
-        }
+//        listOf(leftEnc, rightEnc).forEach {
+//            it.apply(block)
+//        }
     }
 }

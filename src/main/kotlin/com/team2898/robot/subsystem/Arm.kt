@@ -39,9 +39,12 @@ object Arm : SingleJointedArmLQR() {
     val rightMaster = TalonWrapper(ARM_RIGHT_MASTER)
     val rightSlave = TalonWrapper(ARM_RIGHT_SLAVE)
 
-    var brake: Boolean = false
-        get() = Timer.getFPGATimestamp() >= profile.endTime()
+    val controlLoop: NotifierLooper
 
+    var brake: Boolean = false
+        get() = Timer.getFPGATimestamp() >= profile.endTime() && test
+
+    var test = false
     var target: Double = 0.0
 
 
@@ -99,7 +102,7 @@ object Arm : SingleJointedArmLQR() {
         }.start()
 
         // Control Loop
-        NotifierLooper(100.0) {
+        controlLoop = NotifierLooper(100.0) {
             val currentTime = Timer.getFPGATimestamp()
             val state = profile.stateByTimeClamped(currentTime)
             val r = Matrix(Matrix(arrayOf(row(state.pos(), state.vel()))).T.data)
@@ -107,7 +110,7 @@ object Arm : SingleJointedArmLQR() {
             val outPutVoltage = voltage + (ARM_KF * cos(x[0, 0] - ARM_OFFSET))
             if (!brake) leftMaster.set(ControlMode.PercentOutput, clampU(-outPutVoltage / 12))
             else (leftMaster.set(ControlMode.PercentOutput, 0.0))
-        }.start()
+        }
     }
 
     fun talons(value: Double) {

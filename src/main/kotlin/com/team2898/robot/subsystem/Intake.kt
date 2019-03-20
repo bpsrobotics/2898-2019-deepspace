@@ -30,17 +30,17 @@ object Intake: Subsystem(50.0, "intake") {
         }.start()
 
         AsyncLooper(50.0) {
-            if (OI.opCtl.getRawButton(1)) {
+            if (OI.opCtl.getRawButton(3) || OI.opCtl.getRawButton(1)) {
                 shooter.set(DoubleSolenoid.Value.kReverse)
             } else {
                 shooter.set(DoubleSolenoid.Value.kForward)
             }
-            if (OI.opCtl.getRawButton(2)) {
+            if (OI.opCtl.getRawButton(2) || OI.opCtl.getRawButton(1)) {
                 hatchSelenoid.set(DoubleSolenoid.Value.kReverse)
             } else {
                 hatchSelenoid.set(DoubleSolenoid.Value.kForward)
             }
-            cargoTalon.set(ControlMode.PercentOutput, -1 * OI.opCtl.getRawAxis(1))
+            cargoTalon.set(ControlMode.PercentOutput, OI.deadzone(-1.0 * OI.opCtl.getRawAxis(1)))
         }.start()
     }
 

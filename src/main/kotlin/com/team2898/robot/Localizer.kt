@@ -10,11 +10,11 @@ import org.ghrobotics.lib.mathematics.units.feet
 object Localizer {
     val dt = 0.01
 
-    val localization = TankEncoderLocalization({Navx.yaw.degree}, {Drivetrain.leftEnc.distance.feet}, {Drivetrain.rightEnc.distance.feet})
+//    val localization = TankEncoderLocalization({Navx.yaw.degree}, {Drivetrain.leftEnc.distance.feet}, {Drivetrain.rightEnc.distance.feet})
 
     init {
         NotifierLooper(1/dt) {
-            localization.update()
+//            localization.update()
         }
     }
 }
