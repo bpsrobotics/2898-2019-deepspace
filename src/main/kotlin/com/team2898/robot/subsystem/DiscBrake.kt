@@ -18,7 +18,6 @@ object DiscBrake : Subsystem(50.0, "disc brake") {
 //    val brake: Boolean
 //        get() = OI.opCtl.getRawButton(2)
 
-    @ImplicitReflectionSerializer
     fun brakeUpdate(b: Boolean = Arm.brake) {
         if (b) brakeSelenoid.set(DoubleSolenoid.Value.kForward)
         else brakeSelenoid.set(DoubleSolenoid.Value.kReverse)

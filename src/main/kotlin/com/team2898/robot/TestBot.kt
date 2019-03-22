@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.TimedRobot
 import edu.wpi.first.wpilibj.command.Scheduler
 
 object TestBot: TimedRobot() {
-    val auto = TestAuto
     override fun robotInit() {
         Drivetrain
         Navx
@@ -20,11 +19,9 @@ object TestBot: TimedRobot() {
     }
 
     override fun autonomousInit() {
-        auto.start()
     }
 
     override fun autonomousPeriodic() {
-        Scheduler.getInstance().run()
     }
 
     override fun teleopPeriodic() {
