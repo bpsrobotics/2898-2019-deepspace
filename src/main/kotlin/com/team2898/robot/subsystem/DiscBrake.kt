@@ -13,7 +13,7 @@ object DiscBrake : Subsystem(50.0, "disc brake") {
 
     override val enableTimes: List<GamePeriods> = listOf(GamePeriods.AUTO, GamePeriods.TELEOP)
 
-    val brakeSelenoid = DoubleSolenoid(7, 2)
+    val brakeSelenoid = DoubleSolenoid(0, 7, 2)
 
 //    val brake: Boolean
 //        get() = OI.opCtl.getRawButton(2)

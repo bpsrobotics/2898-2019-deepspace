@@ -13,8 +13,10 @@ object Safety: Command() {
         Arm.test = false
         Arm.controlLoop.end()
     }
+
     override fun execute() {
         Arm.leftMaster.set(ControlMode.PercentOutput, 0.2)
+        println("safety")
     }
 
     override fun end() {
@@ -23,5 +25,4 @@ object Safety: Command() {
         Arm.armEnc.reset()
         Arm.controlLoop.start()
     }
-
 }

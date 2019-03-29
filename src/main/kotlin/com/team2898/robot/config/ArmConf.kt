@@ -8,9 +8,9 @@ val Arm_B = Matrix(arrayOf(row(0.00119267), row(0.192770918)))
 val Arm_Kc = Matrix(arrayOf(row(25.29673028, 1.27854674)))
 val Arm_Kff = Matrix(arrayOf(row(0.80116395, 5.17683707)))
 val Arm_M = Matrix(arrayOf(row(0.79374646), row(0.0825426)))
-val ARM_OFFSET = 1.15
+val ARM_OFFSET = 1.1567
 
-val ARM_KF = 1.9
+val ARM_KF = 1.5
 
 const val cargol1 = 0.01631882850614698
 const val cargol2 = 0.98

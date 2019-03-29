@@ -32,7 +32,7 @@ object Arm : SingleJointedArmLQR() {
     var prevTime = 0.0
     var prevVel = 0.0
     var acc = 0.0
-    val constrains = MotionProfileConstraints(2.0, 1.0)
+    val constrains = MotionProfileConstraints(3.0, 1.5)
 
     val leftMaster = TalonWrapper(ARM_LEFT_MASTER)
     val leftSlace = TalonWrapper(ARM_LEFT_SLAVE)
