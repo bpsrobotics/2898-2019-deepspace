@@ -39,7 +39,7 @@ object Intake: Subsystem(50.0, "intake") {
             var shooterState = OI.opCtl.getRawButton(3) || OI.opCtl.getRawButton(1)
             var hatchState = OI.opCtl.getRawButton(2) || OI.opCtl.getRawButton(1)
             var latchState = (OI.opCtl.getRawAxis(1) < 0.5 && OI.opCtl.getRawAxis(1) > -0.5)
-            var cargoValue = if (latchState) 0.0 else OI.opCtl.getRawAxis(1) * -0.5
+            var cargoValue = if (latchState) 0.0 else OI.opCtl.getRawAxis(1) * -0.9
 
             if (OI.opCtl.getRawButton(4) || autoIntake) {
                 autoIntake = true
@@ -47,7 +47,7 @@ object Intake: Subsystem(50.0, "intake") {
                 cargoValue = -0.7
             }
 
-            if (cargoTalon.outputCurrent > 20.0 && autoIntake) {
+            if ((cargoTalon.outputCurrent > 20.0 && autoIntake) || OI.opCtl.getRawButton(5)) {
                 one = true
                 autoIntake = false
                 latchState = true
