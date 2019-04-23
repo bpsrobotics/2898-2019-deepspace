@@ -38,6 +38,5 @@ fun ramsete(
     val vl = v - w * wheelbase / 2
     val vr = v + w * wheelbase / 2
 
-    //println("v: $linearVel, w: $angularVel, vl: $vl, vr: $vr")
     return Pair(vl, vr)
 }

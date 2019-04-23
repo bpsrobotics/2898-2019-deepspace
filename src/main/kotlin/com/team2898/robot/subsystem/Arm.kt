@@ -74,8 +74,8 @@ object Arm : SingleJointedArmLQR() {
 
         listOf(leftMaster, leftSlace, rightSlave, rightMaster).forEach {
             it.apply {
-                configContinuousCurrentLimit(35)
-                configPeakCurrentLimit(40)
+                configContinuousCurrentLimit(15)
+                configPeakCurrentLimit(20)
                 configVoltageCompSaturation(12.0)
             }
         }

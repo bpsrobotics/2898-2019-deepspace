@@ -1,16 +1,21 @@
 package com.team2898.robot
 
 import com.team2898.engine.async.AsyncLooper
+import com.team2898.engine.drivers.I2C_SLAVE_DEVICE_ADDRESS
 import com.team2898.engine.subsystems.Navx
+import com.team2898.robot.commands.Safety
 import com.team2898.robot.commands.commandGroups.TeleopWSafety
 import com.team2898.robot.subsystem.*
 import edu.wpi.first.cameraserver.CameraServer
 import edu.wpi.first.wpilibj.*
 import edu.wpi.first.wpilibj.command.Scheduler
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import kotlinx.serialization.ImplicitReflectionSerializer
 
 @ImplicitReflectionSerializer
 object Robot : TimedRobot() {
+    val i2c = I2C(I2C.Port.kOnboard, I2C_SLAVE_DEVICE_ADDRESS)
+    val data = byteArrayOf()
     override fun robotInit() {
         val LED = DigitalOutput(2)
         AsyncLooper(50.0) {
@@ -23,6 +28,7 @@ object Robot : TimedRobot() {
         Drivetrain
         DiscBrake
         Intake
+        Safety
     }
     override fun autonomousInit() {
         TeleopWSafety.start()

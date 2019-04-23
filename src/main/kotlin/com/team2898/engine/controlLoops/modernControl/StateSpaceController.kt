@@ -73,6 +73,7 @@ open class StateSpaceController<E : Enum<*>>(
             Logger.logInfo(reflectLocation(), LogLevel.ERROR, "Warning, updated gain matrices wrong dimension")
             return
         }
+
     }
 
     /**

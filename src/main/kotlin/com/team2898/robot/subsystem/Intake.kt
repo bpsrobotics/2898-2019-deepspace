@@ -7,9 +7,11 @@ import com.team2898.engine.logic.Subsystem
 import com.team2898.engine.motion.TalonWrapper
 import com.team2898.robot.OI
 import com.team2898.robot.config.CARGOINTAKE
+import edu.wpi.first.wpilibj.DigitalInput
 import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import kotlin.math.abs
+import kotlin.math.sign
 
 
 object Intake: Subsystem(50.0, "intake") {
@@ -24,22 +26,38 @@ object Intake: Subsystem(50.0, "intake") {
     var one = false
     var two = false
     var three = false
+    var four = false
+    var fifth = false
+    var six = false
     var autoIntake = false
+    var isHatchAuto = false
 
-
+    val hatchLimit = DigitalInput(7)
     init {
         AsyncLooper(50.0) {
             SmartDashboard.putNumber("cargo A", cargoTalon.outputCurrent)
         }.start()
 
         AsyncLooper(50.0) {
-            if (three) reset()
+            if (six) reset()
+            if (fifth) six = fifth
+            if (four) fifth = four
+            if (three) four = three
             if (two) three = two
             if (one) two = one
-            var shooterState = OI.opCtl.getRawButton(3) || OI.opCtl.getRawButton(1)
-            var hatchState = OI.opCtl.getRawButton(2) || OI.opCtl.getRawButton(1)
+
+            val isHatchIn = !hatchLimit.get()
+
+            var shooterState = OI.opCtl.getRawButton(1)
+            var hatchState = (OI.opCtl.getRawButton(2) || OI.opCtl.getRawButton(1)) || isHatchAuto
             var latchState = (OI.opCtl.getRawAxis(1) < 0.5 && OI.opCtl.getRawAxis(1) > -0.5)
-            var cargoValue = if (latchState) 0.0 else OI.opCtl.getRawAxis(1) * -0.9
+            var cargoValue = if (latchState) 0.0 else sign(OI.opCtl.getRawAxis(1)) * -0.8
+
+            if (isHatchIn && isHatchAuto) {
+                isHatchAuto = false
+            }
+            if (isHatchAuto) hatchState = true
+
 
             if (OI.opCtl.getRawButton(4) || autoIntake) {
                 autoIntake = true
@@ -47,13 +65,14 @@ object Intake: Subsystem(50.0, "intake") {
                 cargoValue = -0.7
             }
 
-            if ((cargoTalon.outputCurrent > 20.0 && autoIntake) || OI.opCtl.getRawButton(5)) {
+            if ((cargoTalon.outputCurrent > 20.0 && autoIntake) || OI.opCtl.getRawButton(6)) {
                 one = true
                 autoIntake = false
                 latchState = true
             }
 
-            if (three) cargoValue = 0.0
+            if (six) cargoValue = 0.0
+
 
             updateShooter(shooterState)
             updateHatch(hatchState)
@@ -86,6 +105,9 @@ object Intake: Subsystem(50.0, "intake") {
         one = false
         two = false
         three = false
+        four = false
+        fifth = false
+        six = false
     }
 }
 

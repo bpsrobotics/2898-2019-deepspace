@@ -1,9 +1,9 @@
 package com.team2898.robot.config
 
 // actual
-const val LEFT_MASTER = 1
+const val LEFT_MASTER = 2
 const val RIGHT_MASTER = 4
-const val LEFT_SLAVE = 2
+const val LEFT_SLAVE = 1
 const val RIGHT_SLAVE = 3
 
 //// prac

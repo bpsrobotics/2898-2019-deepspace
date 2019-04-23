@@ -38,6 +38,9 @@ object Teleop : Command() {
                 OI.quickTurn,
                 false
         )
+        if (OI.driverController.getRawButton(6)){
+            power = power.adjPower(0.5)
+        }
         if (OI.driverController.pov == 90) {
             power = DriveSignal(left = 0.2, right = -0.1)
         }
@@ -51,5 +54,9 @@ object Teleop : Command() {
             power = DriveSignal(-0.3, -0.3)
         }
         Drivetrain.openLoopPower(power)
+    }
+
+    fun DriveSignal.adjPower(power: Double): DriveSignal {
+        return DriveSignal(this.left * power, this.right * power, this.brake)
     }
 }

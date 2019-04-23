@@ -52,6 +52,7 @@ object Drivetrain: DrivetrainLQR() {
         leftSlave slaveTo leftMaster
         listOf(leftMaster, rightMaster).forEach {
             it.apply {
+                configVoltageCompSaturation(12.0, 10)
             }
         }
 //        AsyncLooper(100.0) {

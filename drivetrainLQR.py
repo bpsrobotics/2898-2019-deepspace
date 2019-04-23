@@ -65,8 +65,9 @@ class Dt(frccontrol.System):
         self.design_lqr(q, r)
 
         qff_vel = 1.0
-        self.design_two_state_feedforward()
-                # [qff_vel, qff_vel], [12.0, 12.0]
+        self.design_two_state_feedforward(
+                [qff_vel, qff_vel], [12.0, 12.0]
+        )
         q_vel = 1.0
         q_voltage = 10.0
         q_encoder_uncertainty = 2.0
