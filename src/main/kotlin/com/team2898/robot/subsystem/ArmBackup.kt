@@ -31,8 +31,8 @@ object ArmBackup: Subsystem(50.0, "arm") {
         listOf(leftMaster, leftSlace, rightSlave, rightMaster).forEach {
             it.apply {
                 setPID(0.02, 0.01, 0.001)
-                configMotionAcceleration(20)
-                configMotionCruiseVelocity(30)
+                configMotionAcceleration(20.0)
+                configMotionCruiseVelocity(30.0)
                 configVoltageCompSaturation(12.0)
             }
         }

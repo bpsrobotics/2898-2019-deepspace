@@ -1,6 +1,5 @@
 package com.team2898.engine.controlLoops.classicControl
 
-import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod
 import com.team2898.engine.math.clamp
 import edu.wpi.first.wpilibj.Timer
 import kotlin.math.abs

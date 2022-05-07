@@ -9,6 +9,7 @@ import com.team2898.robot.OI
 import com.team2898.robot.config.CARGOINTAKE
 import edu.wpi.first.wpilibj.DigitalInput
 import edu.wpi.first.wpilibj.DoubleSolenoid
+import edu.wpi.first.wpilibj.PneumaticsModuleType
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import kotlin.math.abs
 import kotlin.math.sign
@@ -17,9 +18,9 @@ import kotlin.math.sign
 object Intake: Subsystem(50.0, "intake") {
     override val enableTimes: List<GamePeriods> = listOf(GamePeriods.TELEOP, GamePeriods.AUTO)
 
-    val hatchSelenoid = DoubleSolenoid(0, 1, 0)
-    val latching = DoubleSolenoid(0, 5, 6)
-    val shooter = DoubleSolenoid(1, 1, 0)
+    val hatchSelenoid = DoubleSolenoid(0, PneumaticsModuleType.CTREPCM, 1, 0)
+    val latching = DoubleSolenoid(0, PneumaticsModuleType.CTREPCM, 5, 6)
+    val shooter = DoubleSolenoid(1, PneumaticsModuleType.CTREPCM, 1, 0)
     val cargoTalon = TalonWrapper(CARGOINTAKE)
 
 

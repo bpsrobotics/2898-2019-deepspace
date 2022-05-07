@@ -13,11 +13,7 @@ import com.team2898.robot.config.RIGHT_MASTER
 import com.team2898.robot.config.RIGHT_SLAVE
 import edu.wpi.first.wpilibj.Encoder
 import edu.wpi.first.wpilibj.Timer
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import org.apache.commons.math3.linear.RealMatrix
-import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
-import org.ghrobotics.lib.mathematics.twodim.geometry.Translation2d
-import kotlin.math.PI
 
 
 object Drivetrain: DrivetrainLQR() {

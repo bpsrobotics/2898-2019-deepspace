@@ -19,11 +19,9 @@ import com.team2898.robot.config.ARM_RIGHT_SLAVE
 import com.team2898.robot.config.ArmConf.ARM_KF
 import com.team2898.robot.config.ArmConf.ARM_OFFSET
 import edu.wpi.first.wpilibj.Encoder
-import edu.wpi.first.wpilibj.Talon
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import kotlin.math.PI
-import kotlin.math.abs
 import kotlin.math.cos
 
 object Arm : SingleJointedArmLQR() {
@@ -41,7 +39,7 @@ object Arm : SingleJointedArmLQR() {
 
     val controlLoop: NotifierLooper
 
-    var brake: Boolean = false
+    var brake: Boolean = true
         get() = Timer.getFPGATimestamp() >= profile.endTime() && test
 
     var test = false
@@ -94,10 +92,10 @@ object Arm : SingleJointedArmLQR() {
             SmartDashboard.putNumber("arm vel", x[1, 0])
             SmartDashboard.putNumber("arm raw", armEnc.get().toDouble())
             SmartDashboard.putNumber("arm dist raw", armEnc.distance)
-            SmartDashboard.putNumber("lm talon output", leftMaster.outputCurrent)
-            SmartDashboard.putNumber("ls talon output", leftSlace.outputCurrent)
-            SmartDashboard.putNumber("rm talon output", rightMaster.outputCurrent)
-            SmartDashboard.putNumber("rs talon output", rightSlave.outputCurrent)
+            SmartDashboard.putNumber("lm talon output", leftMaster.statorCurrent)
+            SmartDashboard.putNumber("ls talon output", leftSlace.statorCurrent)
+            SmartDashboard.putNumber("rm talon output", rightMaster.statorCurrent)
+            SmartDashboard.putNumber("rs talon output", rightSlave.statorCurrent)
             SmartDashboard.putNumber("Kf", -ARM_KF * cos(x[0, 0] + ARM_OFFSET))
         }.start()
 

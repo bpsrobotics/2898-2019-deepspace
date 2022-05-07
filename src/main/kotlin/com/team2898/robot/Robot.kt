@@ -10,9 +10,7 @@ import edu.wpi.first.cameraserver.CameraServer
 import edu.wpi.first.wpilibj.*
 import edu.wpi.first.wpilibj.command.Scheduler
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
-import kotlinx.serialization.ImplicitReflectionSerializer
 
-@ImplicitReflectionSerializer
 object Robot : TimedRobot() {
     val i2c = I2C(I2C.Port.kOnboard, I2C_SLAVE_DEVICE_ADDRESS)
     val data = byteArrayOf()
@@ -22,7 +20,7 @@ object Robot : TimedRobot() {
             if (OI.driverController.getRawButton(5)) LED.set(true)
             else LED.set(false)
         }.start()
-        CameraServer.getInstance().startAutomaticCapture()
+        CameraServer.startAutomaticCapture()
         Navx.reset()
         Arm
         Drivetrain
@@ -55,7 +53,6 @@ object Robot : TimedRobot() {
     }
 }
 
-@ImplicitReflectionSerializer
 fun main() {
     RobotBase.startRobot { Robot }
 }

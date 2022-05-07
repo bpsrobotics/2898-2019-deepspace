@@ -1,0 +1,11 @@
+build/
+.gradle/
+gradle.properties
+.idea/
+2898-2019-deepspace.iml
+2898-2019-deepspace.ipr
+2898-2019-deepspace.iws
+
+*.csv
+test.csv
+test.py

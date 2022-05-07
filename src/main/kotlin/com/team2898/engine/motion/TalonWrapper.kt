@@ -112,7 +112,7 @@ class TalonWrapper(
 
     @Synchronized
     fun setPID(Kp: Double, Ki: Double, Kd: Double, Kf: Double = 0.0, slot: Int = 0, iZone: Int = 0) {
-        config_IntegralZone(slot, iZone, 0)
+        config_IntegralZone(slot, iZone.toDouble(), 0)
         config_kP(slot, Kp, 0)
         config_kI(slot, Ki, 0)
         config_kD(slot, Kd, 0)

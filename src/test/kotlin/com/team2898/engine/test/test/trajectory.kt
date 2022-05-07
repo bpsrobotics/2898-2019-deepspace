@@ -1,10 +1,6 @@
 package com.team2898.engine.test.test
 
 import com.team2898.engine.kinematics.Rotation2d
-import jaci.pathfinder.Trajectory
-import kotlin.math.PI
-import kotlin.math.abs
-import kotlin.math.sign
 
 
 data class TrajPoint(val t: Double, val x: Double, val y: Double, val vel: Double, val heading: Double, val angVel: Double)

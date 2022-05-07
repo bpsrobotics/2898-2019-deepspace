@@ -8,7 +8,6 @@ import com.team2898.robot.subsystem.Arm
 import com.team2898.robot.subsystem.DiscBrake
 import com.team2898.robot.subsystem.Drivetrain
 import edu.wpi.first.wpilibj.command.Command
-import kotlinx.serialization.ImplicitReflectionSerializer
 
 object Teleop : Command() {
 
@@ -18,7 +17,6 @@ object Teleop : Command() {
 
     override fun isFinished(): Boolean = false
 
-    @ImplicitReflectionSerializer
     override fun execute() {
         DiscBrake.brakeUpdate()
         if (OI.opCtl.getRawButton(7)) Arm.updateTarget(hatchl3 + 0.25)
