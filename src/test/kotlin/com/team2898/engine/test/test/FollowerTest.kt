@@ -7,9 +7,9 @@
 //import com.team254.lib.util.motion.MotionState
 //import com.team2898.engine.math.linear.*
 //import com.team2898.robot.Localizer
-//import com.team2898.robot.config.DrivetrainConf.Dt_A
-//import com.team2898.robot.config.DrivetrainConf.Dt_Kc
-//import com.team2898.robot.config.DrivetrainConf.Dt_Kff
+//import com.team2898.robot.config.getDt_A
+//import com.team2898.robot.config.getDt_Kc
+//import com.team2898.robot.config.getDt_Kff
 //import com.team2898.robot.motion.Trajectories
 //import edu.wpi.first.wpilibj.command.WaitCommand
 //import io.kotlintest.specs.StringSpec

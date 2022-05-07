@@ -3,17 +3,10 @@ package com.team2898.engine.subsystems
 import com.kauailabs.navx.frc.AHRS
 import com.team2898.engine.async.AsyncLooper
 import com.team2898.engine.kinematics.Rotation2d
-import com.team2898.engine.logging.Logger
-import com.team2898.engine.logging.reflectLocation
-import com.team2898.engine.signalProcessing.MovingAverageFilter
-import com.team2898.engine.types.CircularArray
-import com.team2898.engine.types.Timestamp
-import com.team2898.robot.config.NavxConf.*
 import com.team2898.engine.logic.ILooper
 import com.team2898.engine.logic.ISelfCheck
 import com.team2898.engine.logic.GamePeriods
-import com.team2898.engine.logic.RunEvery
-import edu.wpi.first.networktables.NetworkTable
+import com.team2898.robot.config.NAVX_PORT
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard as smartDashboard
 
 

@@ -1,4 +1,4 @@
-package com.team2898.robot.config.DrivetrainConf
+package com.team2898.robot.config
 
 import com.team2898.engine.math.linear.Matrix
 import com.team2898.engine.math.linear.row
@@ -17,11 +17,6 @@ val Dt_Kc = Matrix(arrayOf(
         row(8.10889379, -1.31590195),
         row(-1.31590195,  8.10889379)
 ))
-
-//val Dt_Kff = Matrix(arrayOf(
-//        row(3.71992519, 1.90743371),
-//        row(1.90743371, 3.71992519)
-//))
 
 val Dt_Kff = Matrix(arrayOf(
         row(47.41310545, -30.17970195),

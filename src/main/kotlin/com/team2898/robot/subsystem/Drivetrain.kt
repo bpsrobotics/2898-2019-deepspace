@@ -1,7 +1,6 @@
 package com.team2898.robot.subsystem
 
 import com.ctre.phoenix.motorcontrol.ControlMode
-import com.team2898.engine.async.AsyncLooper
 import com.team2898.engine.async.NotifierLooper
 import com.team2898.engine.math.linear.*
 import com.team2898.engine.motion.DriveSignal

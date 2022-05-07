@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.command.Command
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 
 object Safety: Command() {
-    val limit = DigitalInput(0)
+    private val limit = DigitalInput(0)
     init {
         AsyncLooper(50.0) {
             SmartDashboard.putBoolean("LIMIT", limit.get())

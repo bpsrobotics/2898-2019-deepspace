@@ -2,16 +2,14 @@ package com.team2898.engine.motion
 
 import com.ctre.phoenix.motorcontrol.*
 import com.ctre.phoenix.motorcontrol.can.TalonSRX
-import com.team2898.engine.logic.StateMachine
 import com.team2898.engine.types.MinMax
 import kotlin.math.roundToInt
 
 class TalonWrapper(
-        deviceID: Int,
-        val stateMachineHz: Double = 10.0,
-        val frameSpeed: MinMax = MinMax(min = 10.0, max = 100.0, norm = 10.0),
-        val frameSpeedHysteresisHz: Double = 5.0,
-        var useAdaptiveFramerate: Boolean = true
+    deviceID: Int,
+    val frameSpeed: MinMax = MinMax(min = 10.0, max = 100.0, norm = 10.0),
+    val frameSpeedHysteresisHz: Double = 5.0,
+    var useAdaptiveFramerate: Boolean = true
 ) : TalonSRX(deviceID) {
 
     companion object {

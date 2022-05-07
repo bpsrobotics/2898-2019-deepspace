@@ -3,7 +3,7 @@ package com.team2898.robot.commands
 import com.team2898.engine.motion.CheesyDrive
 import com.team2898.engine.motion.DriveSignal
 import com.team2898.robot.OI
-import com.team2898.robot.config.ArmConf.*
+import com.team2898.robot.config.*
 import com.team2898.robot.subsystem.Arm
 import com.team2898.robot.subsystem.DiscBrake
 import com.team2898.robot.subsystem.Drivetrain
@@ -19,6 +19,7 @@ object Teleop : Command() {
 
     override fun execute() {
         DiscBrake.brakeUpdate()
+        // TODO: figure out what these do and move to OI
         if (OI.opCtl.getRawButton(7)) Arm.updateTarget(hatchl3 + 0.25)
         if (OI.opCtl.getRawButton(9)) Arm.updateTarget(hatchl2 + 0.45)
         if (OI.opCtl.getRawButton(11)) Arm.updateTarget(hatchl1 + 0.45)
@@ -54,7 +55,7 @@ object Teleop : Command() {
         Drivetrain.openLoopPower(power)
     }
 
-    fun DriveSignal.adjPower(power: Double): DriveSignal {
+    private fun DriveSignal.adjPower(power: Double): DriveSignal {
         return DriveSignal(this.left * power, this.right * power, this.brake)
     }
 }

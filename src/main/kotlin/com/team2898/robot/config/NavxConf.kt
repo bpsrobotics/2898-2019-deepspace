@@ -1,4 +1,4 @@
-package com.team2898.robot.config.NavxConf
+package com.team2898.robot.config
 
 import edu.wpi.first.wpilibj.SPI
 

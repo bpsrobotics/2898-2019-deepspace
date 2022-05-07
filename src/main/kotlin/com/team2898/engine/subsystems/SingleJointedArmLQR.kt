@@ -2,8 +2,7 @@ package com.team2898.engine.subsystems
 
 import com.team2898.engine.math.clamp
 import com.team2898.engine.math.linear.*
-import com.team2898.robot.config.ArmConf.*
-import org.apache.commons.math3.linear.MatrixUtils
+import com.team2898.robot.config.*
 import org.apache.commons.math3.linear.RealMatrix
 
 abstract class SingleJointedArmLQR {

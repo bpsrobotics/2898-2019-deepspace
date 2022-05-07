@@ -11,18 +11,16 @@ import edu.wpi.first.wpilibj.DigitalInput
 import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.PneumaticsModuleType
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
-import kotlin.math.abs
 import kotlin.math.sign
 
 
 object Intake: Subsystem(50.0, "intake") {
     override val enableTimes: List<GamePeriods> = listOf(GamePeriods.TELEOP, GamePeriods.AUTO)
 
-    val hatchSelenoid = DoubleSolenoid(0, PneumaticsModuleType.CTREPCM, 1, 0)
-    val latching = DoubleSolenoid(0, PneumaticsModuleType.CTREPCM, 5, 6)
-    val shooter = DoubleSolenoid(1, PneumaticsModuleType.CTREPCM, 1, 0)
-    val cargoTalon = TalonWrapper(CARGOINTAKE)
-
+    private val hatchSelenoid = DoubleSolenoid(0, PneumaticsModuleType.CTREPCM, 1, 0)
+    private val latching = DoubleSolenoid(0, PneumaticsModuleType.CTREPCM, 5, 6)
+    private val shooter = DoubleSolenoid(1, PneumaticsModuleType.CTREPCM, 1, 0)
+    private val cargoTalon = TalonWrapper(CARGOINTAKE)
 
     var one = false
     var two = false
