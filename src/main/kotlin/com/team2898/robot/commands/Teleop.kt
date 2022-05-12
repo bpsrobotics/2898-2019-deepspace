@@ -3,7 +3,6 @@ package com.team2898.robot.commands
 import com.team2898.engine.motion.CheesyDrive
 import com.team2898.engine.motion.DriveSignal
 import com.team2898.robot.OI
-import com.team2898.robot.config.*
 import com.team2898.robot.subsystem.Arm
 import com.team2898.robot.subsystem.DiscBrake
 import com.team2898.robot.subsystem.Drivetrain
@@ -11,23 +10,23 @@ import edu.wpi.first.wpilibj.command.Command
 
 object Teleop : Command() {
 
-    override fun initialize() {
-        Arm.controlLoop.start()
-    }
+//    override fun initialize() {
+//        Arm.controlLoop.start()
+//    }
 
     override fun isFinished(): Boolean = false
 
     override fun execute() {
         DiscBrake.brakeUpdate()
-        // TODO: figure out what these do and move to OI
-        if (OI.opCtl.getRawButton(7)) Arm.updateTarget(hatchl3 + 0.25)
-        if (OI.opCtl.getRawButton(9)) Arm.updateTarget(hatchl2 + 0.45)
-        if (OI.opCtl.getRawButton(11)) Arm.updateTarget(hatchl1 + 0.45)
-        if (OI.opCtl.getRawButton(8)) Arm.updateTarget(cargol3)
-        if (OI.opCtl.getRawButton(10)) Arm.updateTarget(cargol2 + 0.1)
-        if (OI.opCtl.getRawButton(12)) Arm.updateTarget(cargol1)
-        if (OI.opCtl.getRawButton(5)) Arm.updateTarget(cargo)
-        if (OI.driverController.aButton) Arm.updateTarget(0.0)
+        // TODO: move to OI
+        if (OI.hatchR3) Arm.updatePosition(Arm.ArmPositions.HATCH_R3)
+        if (OI.hatchR2) Arm.updatePosition(Arm.ArmPositions.HATCH_R2)
+        if (OI.hatchR1) Arm.updatePosition(Arm.ArmPositions.HATCH_R1)
+        if (OI.cargoR3) Arm.updatePosition(Arm.ArmPositions.CARGO_R3)
+        if (OI.cargoR2) Arm.updatePosition(Arm.ArmPositions.CARGO_R2)
+        if (OI.cargoR1) Arm.updatePosition(Arm.ArmPositions.CARGO_R1)
+        if (OI.cargoC) Arm.updatePosition(Arm.ArmPositions.CARGO_C)
+        if (OI.driverController.aButton) Arm.updatePosition(Arm.ArmPositions.BOTTOM)
         if (OI.driverController.bButton || OI.opCtl.pov == 0) Arm.updateTarget(Arm.currentPos.pos() + 0.1)
         if (OI.driverController.xButton || OI.opCtl.pov == 180) Arm.updateTarget(Arm.currentPos.pos() - 0.1)
 

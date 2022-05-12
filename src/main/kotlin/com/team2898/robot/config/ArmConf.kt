@@ -10,7 +10,7 @@ val Arm_Kff = Matrix(arrayOf(row(0.80116395, 5.17683707)))
 val Arm_M = Matrix(arrayOf(row(0.79374646), row(0.0825426)))
 const val ARM_OFFSET = 1.1567
 
-const val ARM_KF = 1.5
+const val ARM_KF = 1.3
 
 const val cargol1 = 0.01631882850614698
 const val cargol2 = 0.98

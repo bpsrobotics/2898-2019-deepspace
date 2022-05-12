@@ -40,4 +40,11 @@ object OI {
     val opCtl = Joystick(1)
     val A get() = opCtl.getRawButton(1)
 
+    val hatchR3 get() = opCtl.getRawButton(7)
+    val hatchR2 get() = opCtl.getRawButton(9)
+    val hatchR1 get() = opCtl.getRawButton(11)
+    val cargoR3 get() = opCtl.getRawButton(8)
+    val cargoR2 get() = opCtl.getRawButton(10)
+    val cargoR1 get() = opCtl.getRawButton(12)
+    val cargoC  get() = opCtl.getRawButton(5)
 }
