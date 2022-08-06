@@ -24,7 +24,7 @@ object Intake: Subsystem(50.0, "intake") {
     // hatch launchers
     private val shooter = DoubleSolenoid(SHOOT)
 
-    private val cargoTalon = TalonWrapper(CARGOINTAKE)
+    private val cargoTalon = TalonWrapper(CARGO_INTAKE)
 
     /** Number of 'ticks' that the cargo talon has been over the current limit for. */
     var overCurrentTicks = -1

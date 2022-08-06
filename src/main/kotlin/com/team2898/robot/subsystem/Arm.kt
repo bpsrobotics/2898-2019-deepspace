@@ -13,17 +13,19 @@ import com.team2898.engine.motion.TalonWrapper
 import com.team2898.engine.subsystems.SingleJointedArmLQR
 import com.team2898.robot.config.*
 import edu.wpi.first.wpilibj.DigitalInput
+import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Encoder
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import kotlin.math.PI
+import kotlin.math.absoluteValue
 import kotlin.math.cos
 
 object Arm : SingleJointedArmLQR() {
-    val armEnc = Encoder(ARM_ENC_A, ARM_ENC_B)
-    var prevDist = 0.0
-    var prevTime = 0.0
-    var prevVel = 0.0
+    private val armEnc = Encoder(ARM_ENC_A, ARM_ENC_B)
+    private var prevDist = 0.0
+    private var prevTime = 0.0
+    private var prevVel = 0.0
     private var acc = 0.0
     private val constrains = MotionProfileConstraints(3.0, 1.0)
 
@@ -34,13 +36,14 @@ object Arm : SingleJointedArmLQR() {
 
     val brake: Boolean
         get() {
-            return Timer.getFPGATimestamp() >= (profile?.endTime() ?: return true) && !isZeroing
+            if (isZeroing) return false
+            return Timer.getFPGATimestamp() >= (profile?.endTime() ?: return true)
         }
 
-    var isZeroing = false
-    var target: Double = 0.0
+    private var isZeroing = false
+    private var target: Double = 0.0
 
-    private val safeRange = -0.2..2.04 + 0.2
+    private val safeRange = -0.2..2.24
 
     private val limitSwitch = DigitalInput(SAFETY_LIMIT_PORT)
 
@@ -54,6 +57,7 @@ object Arm : SingleJointedArmLQR() {
         set(_) {}
 
     fun startZeroing() {
+        panic = false
         isZeroing = true
         leftMaster.set(0.2)
     }
@@ -68,7 +72,9 @@ object Arm : SingleJointedArmLQR() {
         )
 
 
-    var profile: MotionProfile? = null
+    private var profile: MotionProfile? = null
+
+    private var panic = false
 
     init {
 
@@ -89,12 +95,15 @@ object Arm : SingleJointedArmLQR() {
         }
 
         AsyncLooper(100.0) {
-            val armVel = (armEnc.distance - prevDist) / (Timer.getFPGATimestamp() - prevTime)
+            val armVel = armEnc.rate
             acc = (armVel - prevVel) / (Timer.getFPGATimestamp() - prevTime)
             prevTime = Timer.getFPGATimestamp()
             prevDist = armEnc.distance
             x = Matrix(arrayOf(row(armEnc.distance, armVel))).T
         }.start()
+
+//        val a = DigitalInput(8)
+//        val b = DigitalInput(9)
 
         AsyncLooper(50.0) {
             SmartDashboard.putNumber("arm pos", x[0, 0] + ARM_OFFSET)
@@ -107,7 +116,13 @@ object Arm : SingleJointedArmLQR() {
 //            SmartDashboard.putNumber("rs talon current", rightSlave.statorCurrent)
 //            SmartDashboard.putNumber("Kf", -ARM_KF * cos(x[0, 0] + ARM_OFFSET))
             SmartDashboard.putBoolean("arm limit switch", !limitSwitch.get())
+
+//            SmartDashboard.putBoolean("aa", a.get())
+//            SmartDashboard.putBoolean("ab", b.get())
         }.start()
+
+        var encoderUnpluggedPos = -1
+        var notMovingTicks = -1
 
         // Control Loop
         NotifierLooper(100.0) {
@@ -115,6 +130,34 @@ object Arm : SingleJointedArmLQR() {
                 armEnc.reset()
                 isZeroing = false
                 println("Resetting arm encoder")
+            }
+
+            if (panic) {
+                println("ENCODER ERROR DETECTED")
+                profile = null
+                leftMaster.set(0.0)
+                rightMaster.set(0.0)
+                return@NotifierLooper
+            }
+
+            if (notMovingTicks > 20) {
+                profile = null
+                panic = true
+                leftMaster.set(0.0)
+                rightMaster.set(0.0)
+                notMovingTicks = 0
+                DriverStation.reportError("ENCODER UNPLUGGED", false)
+            }
+            if (leftMaster.motorOutputPercent.absoluteValue > 0.1) {
+                if ((armEnc.get() - encoderUnpluggedPos).absoluteValue < 2) {
+                    notMovingTicks++
+                } else {
+                    notMovingTicks = 0
+                    encoderUnpluggedPos = armEnc.get()
+                }
+            } else {
+                notMovingTicks = 0
+                encoderUnpluggedPos = armEnc.get()
             }
 
             if (isZeroing) return@NotifierLooper

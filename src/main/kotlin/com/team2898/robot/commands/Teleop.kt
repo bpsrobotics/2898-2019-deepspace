@@ -27,8 +27,8 @@ object Teleop : Command() {
         if (OI.cargoR1) Arm.updatePosition(Arm.ArmPositions.CARGO_R1)
         if (OI.cargoC) Arm.updatePosition(Arm.ArmPositions.CARGO_C)
         if (OI.driverController.aButton) Arm.updatePosition(Arm.ArmPositions.BOTTOM)
-        if (OI.driverController.bButton || OI.opCtl.pov == 0) Arm.updateTarget(Arm.currentPos.pos() + 0.1)
-        if (OI.driverController.xButton || OI.opCtl.pov == 180) Arm.updateTarget(Arm.currentPos.pos() - 0.1)
+//        if (OI.driverController.bButton || OI.opCtl.pov == 0) Arm.updateTarget(Arm.currentPos.pos() + 0.1)
+//        if (OI.driverController.xButton || OI.opCtl.pov == 180) Arm.updateTarget(Arm.currentPos.pos() - 0.1)
 
         var power = CheesyDrive.updateCheesy(
                 (if (!OI.quickTurn) OI.turn else -OI.leftTrigger + OI.rightTrigger),

@@ -25,6 +25,7 @@ object Robot : TimedRobot() {
         Intake
         Safety
     }
+
     override fun autonomousInit() {
         TeleopWSafety.start()
     }

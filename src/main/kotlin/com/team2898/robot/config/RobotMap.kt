@@ -14,13 +14,13 @@ const val ARM_RIGHT_SLAVE = 6
 const val ARM_LEFT_MASTER = 7
 const val ARM_LEFT_SLAVE = 8
 
-const val CARGOINTAKE = 9
+const val CARGO_INTAKE = 9
 
 // DIO
 const val SAFETY_LIMIT_PORT = 0
 
-const val ARM_ENC_A = 8
-const val ARM_ENC_B = 9
+const val ARM_ENC_A = 3
+const val ARM_ENC_B = 4
 
 // Pneumatics
 data class PneumaticsMap(
